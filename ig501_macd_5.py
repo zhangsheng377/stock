@@ -27,27 +27,22 @@ def func():
         data_df['macd'], data_df['signal'], data_df['hist'] = talib.MACD(data_df['c'])
 
         date_str = datetime.now().strftime("%Y-%m-%d")
-        # date_str = '2020-12-03'
+        # date_str = '2020-12-07'
         if date_str != old_date:
             old_date = date_str
             sign_len = 0
         data_df_today = data_df[data_df['d'].str.contains(date_str)]
         data_df_today['date'] = data_df_today['d'].str[11:]
-        print(data_df_today[['date', 'c', 'macd', 'signal', 'hist']].to_markdown(index=False))
+        # print(data_df_today[['date', 'c', 'macd', 'signal', 'hist']].to_markdown(index=False))
 
         is_list = ['']
         for i in range(1, data_df_today.shape[0]):
             before = data_df_today.iloc[i - 1]['hist']
             now = data_df_today.iloc[i]['hist']
-            if before <= 0 and now > 0:
-                is_list.append("macd由负变正发生反转")
-            elif before >= 0 and now < 0:
-                is_list.append("macd由正变负发生反转")
-            elif numpy.sign(now + now - before) != numpy.sign(now):
-                if now > 0:
-                    is_list.append("macd即将由正变负发生反转")
-                else:
-                    is_list.append("macd即将由负变正发生反转")
+            if numpy.sign(before) != numpy.sign(now):
+                is_list.append("macd信号,将持续当前走势")
+            elif numpy.sign(now + (now - before) / 2) != numpy.sign(now):
+                is_list.append("macd斜率信号,可能持续当前走势")
             else:
                 is_list.append('')
         # data_df_today['is'] = is_list
