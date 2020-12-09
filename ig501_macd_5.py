@@ -11,7 +11,7 @@ import talib
 
 from ftqq_tokens import ftqq_tokens
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 schdule = sched.scheduler(time.time, time.sleep)
 sign_len = 0
