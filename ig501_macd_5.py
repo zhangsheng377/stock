@@ -11,6 +11,8 @@ import talib
 
 from ftqq_tokens import ftqq_tokens
 
+VERSION = "0.0.1"
+
 schdule = sched.scheduler(time.time, time.sleep)
 sign_len = 0
 old_date = ""
@@ -78,5 +80,6 @@ def func():
     schdule.enter(60 * 5, 0, func)
 
 
+print(VERSION)
 schdule.enter(0, 0, func)
 schdule.run()
