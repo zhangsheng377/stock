@@ -1,4 +1,5 @@
 FROM ubuntu:latest
+ENTRYPOINT []
 
 RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
 RUN apt clean && apt update && apt install git python3 python3-pip -y
@@ -11,9 +12,14 @@ RUN pip3 install numpy pandas requests TA-Lib tabulate
 
 RUN git clone https://github.com/zhangsheng377/stock.git
 COPY ftqq_tokens.py /stock/ftqq_tokens.py
-COPY docker_cmd.sh /stock/docker_cmd.sh
 
 WORKDIR /stock
 
 # ENTRYPOINT ["/stock/docker_cmd.sh"]
 CMD ["/bin/bash", "docker_cmd.sh"]
+
+# docker build -t zhangsheng377/stock .
+# docker run -ti zhangsheng377/stock
+# docker run -ti zhangsheng377/stock /bin/bash
+# docker run -ti -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro zhangsheng377/stock
+# docker run -d -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/stock
