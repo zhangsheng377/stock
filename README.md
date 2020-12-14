@@ -16,3 +16,9 @@ show dbs
 use tushare
 db.sh_600196.insert({"test":"testdb"})
 ```
+
+## build
+
+```
+docker build -t zhangsheng377/save_tushare -f Dockerfile_tushare .
+```
