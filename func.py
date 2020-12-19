@@ -25,8 +25,8 @@ policies = [macd_5_minute.handel,
 def func():
     global old_time
     try:
-        # date_str = datetime.now().strftime("%Y-%m-%d")
-        date_str = '2020-12-18'
+        date_str = datetime.now().strftime("%Y-%m-%d")
+        # date_str = '2020-12-18'
 
         regex_str = '^' + date_str
         data = mongo_db_600196.find(filter={'_id': {"$regex": regex_str}}, sort=[('_id', 1)])
