@@ -1,2 +1,2 @@
 #!/bin/bash
-git pull && python3 ig501_macd_5.py
+git pull && python3 func.py
