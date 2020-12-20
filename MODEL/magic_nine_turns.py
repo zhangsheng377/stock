@@ -22,7 +22,8 @@ def handel(data):
                 if count == 9:
                     result_list.append({'time': data_minute_df.iloc[i]['time'],
                                         'price': data_minute_df.iloc[i]['price'],
-                                        '指标': '神奇九转,连续上涨,将大概率下跌'
+                                        '指标': '神奇九转,连续上涨,将大概率下跌',
+                                        'plt': 'go',
                                         })
                     count = -1
             else:
@@ -33,7 +34,8 @@ def handel(data):
                 if count == 9:
                     result_list.append({'time': data_minute_df.iloc[i]['time'],
                                         'price': data_minute_df.iloc[i]['price'],
-                                        '指标': '神奇九转,连续下跌,将大概率上涨'
+                                        '指标': '神奇九转,连续下跌,将大概率上涨',
+                                        'plt': 'ro',
                                         })
                     count = -1
             else:

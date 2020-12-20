@@ -37,10 +37,12 @@ def handel(data):
                 result_list.append({'time': data_5_minute_df.iloc[i]['time'],
                                     'price': data_5_minute_df.iloc[i]['price'],
                                     '指标': 'macd信号,将持续上涨',
+                                    'plt': 'rx',
                                     })
             elif now < 0:
                 result_list.append({'time': data_5_minute_df.iloc[i]['time'],
                                     'price': data_5_minute_df.iloc[i]['price'],
                                     '指标': 'macd信号,将持续下跌',
+                                    'plt': 'gx',
                                     })
     return result_list
