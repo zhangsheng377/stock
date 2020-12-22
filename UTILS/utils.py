@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from ftqq_tokens import ftqq_tokens
 from UTILS.upload_pic import upload
 
-old_time = None
+old_result_len = 0
 
 
 def add_result(ori_result, new_result):
@@ -41,17 +41,18 @@ def plot_result(data, data_result_df, file_name):
     if not os.path.exists('tmp'):
         os.makedirs('tmp')
     plt.savefig(os.path.join('tmp', file_name))
+    plt.close()
     upload(file_name + ".png")
 
 
 def send_result(data, result_list):
-    global old_time
+    global old_result_len
     data_result_df = pandas.DataFrame(result_list)
-    if not data_result_df.empty and data_result_df['time'][data_result_df.shape[0] - 1] != old_time:
+    if not data_result_df.empty and data_result_df.shape[0] != old_result_len:
         data_result_df = data_result_df.sort_values(by='time', ascending=True)
-        old_time = data_result_df['time'][data_result_df.shape[0] - 1]
+        old_result_len = data_result_df.shape[0]
         print(data_result_df)
-        print(old_time)
+        print(old_result_len)
 
         file_name = str(uuid.uuid1())
         plot_result(data, data_result_df, file_name)
