@@ -5,7 +5,7 @@ from datetime import datetime
 
 import tushare as ts
 
-from DATABASE import database_factory
+from db_sheets import db_sheets
 
 VERSION = "0.0.4"
 
@@ -16,7 +16,7 @@ stock_locks = {
 }
 
 stocks = [
-    ("600196", database_factory(database_name="tushare", sheet_name="sh_600196", model="pymongo"), None),
+    ("600196", None),
 ]
 
 '''
@@ -48,7 +48,7 @@ stocks = [
 '''
 
 
-def func(db_sheet, stock_id, last_time):
+def func(stock_id, last_time):
     if not stock_locks[stock_id]:
         stock_locks[stock_id] = True
         df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
@@ -62,7 +62,7 @@ def func(db_sheet, stock_id, last_time):
 
             data_json['_id'] = data_json['date'] + " " + data_json['time']
             print(data_json)
-            insert_result = db_sheet.insert(data_json)
+            insert_result = db_sheets[stock_id].insert(data_json)
             if insert_result:
                 print('评论插入成功\n')
             else:
@@ -70,10 +70,10 @@ def func(db_sheet, stock_id, last_time):
 
         print(datetime.now())
         stock_locks[stock_id] = False
-        schdule.enter(1, 0, func, (db_sheet, stock_id, last_time))
+        schdule.enter(1, 0, func, (stock_id, last_time))
 
 
 print(VERSION)
-for stock_id, db_sheet, last_time in stocks:
-    schdule.enter(0, 0, func, (db_sheet, stock_id, last_time))
+for stock_id, last_time in stocks:
+    schdule.enter(0, 0, func, (stock_id, last_time))
 schdule.run()
