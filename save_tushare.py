@@ -1,5 +1,6 @@
 import json
 import sched
+import threading
 import time
 from datetime import datetime
 
@@ -7,11 +8,15 @@ import tushare as ts
 
 from DATABASE import database_factory
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 schdule = sched.scheduler(time.time, time.sleep)
-last_time = None
-mongo_db_600196 = database_factory(database_name="tushare", sheet_name="sh_600196", model="pymongo")
+
+stocks = [
+    ("600196", database_factory(database_name="tushare", sheet_name="sh_600196", model="pymongo"), None),
+]
+
+lock = threading.Lock()
 
 '''
 0：name，股票名字
@@ -42,29 +47,30 @@ mongo_db_600196 = database_factory(database_name="tushare", sheet_name="sh_60019
 '''
 
 
-def func(mongo_db, stock_id):
-    global last_time
-    df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
-    data_dict = df.to_dict()
-    data_time = data_dict['time'][0]
-    if data_time != last_time:
-        last_time = data_time
+def func(db_sheet, stock_id, last_time):
+    with lock:
+        df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
+        data_dict = df.to_dict()
+        data_time = data_dict['time'][0]
+        if data_time != last_time:
+            last_time = data_time
 
-        data_json_str = df.to_json(orient='records')[1:-1]
-        data_json = json.loads(data_json_str)
+            data_json_str = df.to_json(orient='records')[1:-1]
+            data_json = json.loads(data_json_str)
 
-        data_json['_id'] = data_json['date'] + " " + data_json['time']
-        print(data_json)
-        insert_result = mongo_db.insert(data_json)
-        if insert_result:
-            print('评论插入成功\n')
-        else:
-            print('已经存在于数据库\n')
+            data_json['_id'] = data_json['date'] + " " + data_json['time']
+            print(data_json)
+            insert_result = db_sheet.insert(data_json)
+            if insert_result:
+                print('评论插入成功\n')
+            else:
+                print('已经存在于数据库\n')
 
-    print(datetime.now())
-    schdule.enter(1, 0, func, (mongo_db_600196, '600196'))
+        print(datetime.now())
+        schdule.enter(1, 0, func, (db_sheet, stock_id, last_time))
 
 
 print(VERSION)
-schdule.enter(0, 0, func, (mongo_db_600196, '600196'))
+for stock_id, db_sheet, last_time in stocks:
+    schdule.enter(0, 0, func, (db_sheet, stock_id, last_time))
 schdule.run()
