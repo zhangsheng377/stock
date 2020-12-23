@@ -1,6 +1,5 @@
 import json
 import sched
-import threading
 import time
 from datetime import datetime
 
@@ -8,15 +7,17 @@ import tushare as ts
 
 from DATABASE import database_factory
 
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 
 schdule = sched.scheduler(time.time, time.sleep)
+
+stock_locks = {
+    "600196": False,
+}
 
 stocks = [
     ("600196", database_factory(database_name="tushare", sheet_name="sh_600196", model="pymongo"), None),
 ]
-
-lock = threading.Lock()
 
 '''
 0：name，股票名字
@@ -48,7 +49,8 @@ lock = threading.Lock()
 
 
 def func(db_sheet, stock_id, last_time):
-    with lock:
+    if not stock_locks[stock_id]:
+        stock_locks[stock_id] = True
         df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
         data_dict = df.to_dict()
         data_time = data_dict['time'][0]
@@ -67,6 +69,7 @@ def func(db_sheet, stock_id, last_time):
                 print('已经存在于数据库\n')
 
         print(datetime.now())
+        stock_locks[stock_id] = False
         schdule.enter(1, 0, func, (db_sheet, stock_id, last_time))
 
 
