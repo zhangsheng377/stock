@@ -6,17 +6,7 @@ import pandas
 import requests
 import matplotlib.pyplot as plt
 
-from ftqq_tokens import ftqq_tokens
 from UTILS.upload_pic import upload
-
-old_result_len = 0
-
-
-def add_result(ori_result, new_result):
-    result = ''
-    if ori_result != '':
-        result = ori_result + '\n'
-    return result + new_result
 
 
 def plot_result(data, data_result_df, file_name):
@@ -45,8 +35,7 @@ def plot_result(data, data_result_df, file_name):
     upload(file_name + ".png")
 
 
-def send_result(data, result_list):
-    global old_result_len
+def send_result(data, result_list, ftqq_token, old_result_len):
     data_result_df = pandas.DataFrame(result_list)
     if not data_result_df.empty and data_result_df.shape[0] != old_result_len:
         data_result_df = data_result_df.sort_values(by='time', ascending=True)
@@ -66,9 +55,10 @@ def send_result(data, result_list):
         result_markdown += "\n\n![](http://image.zhangshengdong.com/{}.png)".format(file_name)
         print(result_markdown)
 
-        for ftqq_token in ftqq_tokens:
-            res = requests.post('https://sc.ftqq.com/{}.send'.format(ftqq_token),
-                                data={'text': 'ig507_600196',
-                                      'desp': result_markdown + "\n\n" + datetime.now().strftime(
-                                          "%Y-%m-%d %H:%M:%S")})
-            print(res.text)
+        res = requests.post('https://sc.ftqq.com/{}.send'.format(ftqq_token),
+                            data={'text': 'ig507_600196',
+                                  'desp': result_markdown + "\n\n" + datetime.now().strftime(
+                                      "%Y-%m-%d %H:%M:%S")})
+        print(res.text)
+
+    return old_result_len

@@ -3,48 +3,58 @@ import sched
 import time
 from datetime import datetime
 
-from DATABASE import database_factory
 from MODEL import macd_5_minute, magic_nine_turns
 from UTILS.utils import send_result
+from ftqq_tokens import users
+from db_sheets import db_sheets
 
-mongo_db_600196 = database_factory(database_name="tushare", sheet_name="sh_600196", model="pymongo")
-
-VERSION = "0.0.5"
+VERSION = "0.0.7"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
-policies = [macd_5_minute.handel,
-            magic_nine_turns.handel,
-            ]
+user_stock_locks = {}
+
+policies = [
+    macd_5_minute.handel,
+    magic_nine_turns.handel,
+]
 
 
-def func():
-    try:
-        data = get_today_tick_data()
+def func(user_name, stock_id, old_result_len):
+    if not user_stock_locks[user_name][stock_id]:
+        user_stock_locks[user_name][stock_id] = True
+        try:
+            # print(db_sheet, ftqq_token, old_result_len)
+            data = get_today_tick_data(db_sheets[stock_id])
 
-        result_list = []
-        for policy in policies:
-            result_list.extend(policy(data))
+            result_list = []
+            for policy in policies:
+                result_list.extend(policy(data))
 
-        send_result(data, result_list)
-    except Exception as e:
-        if e.args[0] == 'data_df is empty':
-            logging.info("data_df is empty.")
-        else:
-            logging.warning("handle data error.", e)
+            old_result_len = send_result(data, result_list, users[user_name]['ftqq_token'], old_result_len)
+        except Exception as e:
+            if e.args[0] == 'data_df is empty':
+                logging.info("data_df is empty.")
+            else:
+                logging.warning("handle data error.", e)
 
-    print(datetime.now())
-    schdule.enter(1, 0, func)
+        print(datetime.now())
+        user_stock_locks[user_name][stock_id] = False
+        schdule.enter(1, 0, func, (user_name, stock_id, old_result_len))
 
 
-def get_today_tick_data():
+def get_today_tick_data(db_sheet):
     date_str = datetime.now().strftime("%Y-%m-%d")
     # date_str = '2020-12-18'
     regex_str = '^' + date_str
-    data = mongo_db_600196.find(filter={'_id': {"$regex": regex_str}}, sort=[('_id', 1)])
+    data = db_sheet.find(filter={'_id': {"$regex": regex_str}}, sort=[('_id', 1)])
     return data
 
 
 print(VERSION)
-schdule.enter(0, 0, func)
+for (user_name, user_data) in users.items():
+    user_stock_locks[user_name] = {}
+    for stock_id in user_data['stocks']:
+        user_stock_locks[user_name][stock_id] = False
+        schdule.enter(0, 0, func, (user_name, stock_id, 0))
 schdule.run()
