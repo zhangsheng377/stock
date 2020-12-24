@@ -7,17 +7,11 @@ import tushare as ts
 
 from db_sheets import db_sheets
 
-VERSION = "0.0.4"
+VERSION = "0.0.5"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
-stock_locks = {
-    "600196": False,
-}
-
-stocks = [
-    ("600196", None),
-]
+stock_locks = {}
 
 '''
 0：name，股票名字
@@ -74,6 +68,7 @@ def func(stock_id, last_time):
 
 
 print(VERSION)
-for stock_id, last_time in stocks:
-    schdule.enter(0, 0, func, (stock_id, last_time))
+for stock_id in db_sheets.keys():
+    stock_locks[stock_id] = False
+    schdule.enter(0, 0, func, (stock_id, None))
 schdule.run()
