@@ -35,7 +35,7 @@ def plot_result(data, data_result_df, file_name):
     upload(file_name + ".png")
 
 
-def send_result(data, result_list, ftqq_token, old_result_len):
+def send_result(stock_id, data, result_list, ftqq_token, old_result_len):
     data_result_df = pandas.DataFrame(result_list)
     if not data_result_df.empty and data_result_df.shape[0] != old_result_len:
         data_result_df = data_result_df.sort_values(by='time', ascending=True)
@@ -56,7 +56,7 @@ def send_result(data, result_list, ftqq_token, old_result_len):
         print(result_markdown)
 
         res = requests.post('https://sc.ftqq.com/{}.send'.format(ftqq_token),
-                            data={'text': 'ig507_600196',
+                            data={'text': stock_id,
                                   'desp': result_markdown + "\n\n" + datetime.now().strftime(
                                       "%Y-%m-%d %H:%M:%S")})
         print(res.text)

@@ -31,7 +31,7 @@ def func(user_name, stock_id, old_result_len):
             for policy in policies:
                 result_list.extend(policy(data))
 
-            old_result_len = send_result(data, result_list, users[user_name]['ftqq_token'], old_result_len)
+            old_result_len = send_result(stock_id, data, result_list, users[user_name]['ftqq_token'], old_result_len)
         except Exception as e:
             if e.args[0] == 'data_df is empty':
                 logging.info("data_df is empty.")
