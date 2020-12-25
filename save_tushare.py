@@ -1,5 +1,7 @@
 import json
+import logging
 import sched
+import threading
 import time
 from datetime import datetime
 
@@ -43,32 +45,33 @@ stock_locks = {}
 
 
 def func(stock_id, last_time):
-    if not stock_locks[stock_id]:
-        stock_locks[stock_id] = True
-        df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
-        data_dict = df.to_dict()
-        data_time = data_dict['time'][0]
-        if data_time != last_time:
-            last_time = data_time
+    with stock_locks[stock_id]:
+        try:
+            df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
+            data_dict = df.to_dict()
+            data_time = data_dict['time'][0]
+            if data_time != last_time:
+                last_time = data_time
 
-            data_json_str = df.to_json(orient='records')[1:-1]
-            data_json = json.loads(data_json_str)
+                data_json_str = df.to_json(orient='records')[1:-1]
+                data_json = json.loads(data_json_str)
 
-            data_json['_id'] = data_json['date'] + " " + data_json['time']
-            print(data_json)
-            insert_result = db_sheets[stock_id].insert(data_json)
-            if insert_result:
-                print('评论插入成功\n')
-            else:
-                print('已经存在于数据库\n')
+                data_json['_id'] = data_json['date'] + " " + data_json['time']
+                print(data_json)
+                insert_result = db_sheets[stock_id].insert(data_json)
+                if insert_result:
+                    print('评论插入成功\n')
+                else:
+                    print('已经存在于数据库\n')
+        except Exception as e:
+            logging.warning("save tushare error.", e)
 
         print(datetime.now())
-        stock_locks[stock_id] = False
         schdule.enter(1, 0, func, (stock_id, last_time))
 
 
 print(VERSION)
 for stock_id in db_sheets.keys():
-    stock_locks[stock_id] = False
+    stock_locks[stock_id] = threading.Lock()
     schdule.enter(0, 0, func, (stock_id, None))
 schdule.run()

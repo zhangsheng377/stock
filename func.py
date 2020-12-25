@@ -1,5 +1,6 @@
 import logging
 import sched
+import threading
 import time
 from datetime import datetime
 
@@ -21,8 +22,7 @@ policies = [
 
 
 def func(user_name, stock_id, old_result_len):
-    if not user_stock_locks[user_name][stock_id]:
-        user_stock_locks[user_name][stock_id] = True
+    with user_stock_locks[user_name][stock_id]:
         try:
             # print(db_sheet, ftqq_token, old_result_len)
             data = get_today_tick_data(db_sheets[stock_id])
@@ -39,7 +39,6 @@ def func(user_name, stock_id, old_result_len):
                 logging.warning("handle data error.", e)
 
         print(datetime.now())
-        user_stock_locks[user_name][stock_id] = False
         schdule.enter(1, 0, func, (user_name, stock_id, old_result_len))
 
 
@@ -55,6 +54,6 @@ print(VERSION)
 for (user_name, user_data) in users.items():
     user_stock_locks[user_name] = {}
     for stock_id in user_data['stocks']:
-        user_stock_locks[user_name][stock_id] = False
+        user_stock_locks[user_name][stock_id] = threading.Lock()
         schdule.enter(0, 0, func, (user_name, stock_id, 0))
 schdule.run()
