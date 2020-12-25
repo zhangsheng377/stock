@@ -1,35 +1,30 @@
+import json
 import logging
 import sched
 import threading
 import time
 from datetime import datetime
 
-from MODEL import macd_5_minute, magic_nine_turns
 from UTILS.utils import send_result
 from ftqq_tokens import users
-from db_sheets import db_sheets
+from db_sheets import db_redis
+from policies import policies
 
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
 user_stock_locks = {}
 
-policies = [
-    macd_5_minute.handel,
-    magic_nine_turns.handel,
-]
-
 
 def func(user_name, stock_id, old_result_len):
     with user_stock_locks[user_name][stock_id]:
         try:
-            # print(db_sheet, ftqq_token, old_result_len)
-            data = get_today_tick_data(db_sheets[stock_id])
+            data = get_stock_data(stock_id)
 
             result_list = []
-            for policy in policies:
-                result_list.extend(policy(data))
+            for (policy_name, _) in policies.items():
+                result_list.extend(get_policy_data(stock_id, policy_name))
 
             old_result_len = send_result(stock_id, data, result_list, users[user_name]['ftqq_token'], old_result_len)
         except Exception as e:
@@ -42,12 +37,12 @@ def func(user_name, stock_id, old_result_len):
         schdule.enter(1, 0, func, (user_name, stock_id, old_result_len))
 
 
-def get_today_tick_data(db_sheet):
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    # date_str = '2020-12-18'
-    regex_str = '^' + date_str
-    data = db_sheet.find(filter={'_id': {"$regex": regex_str}}, sort=[('_id', 1)])
-    return data
+def get_stock_data(stock_id):
+    return json.loads(db_redis.get(stock_id))
+
+
+def get_policy_data(stock_id, policy_name):
+    return json.loads(db_redis.get(stock_id + '_' + policy_name))
 
 
 print(VERSION)

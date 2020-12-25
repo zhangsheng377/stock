@@ -37,11 +37,11 @@ def plot_result(data, data_result_df, file_name):
 
 def send_result(stock_id, data, result_list, ftqq_token, old_result_len):
     data_result_df = pandas.DataFrame(result_list)
-    if not data_result_df.empty and data_result_df.shape[0] != old_result_len:
+    if len(data) > 0 and not data_result_df.empty and data_result_df.shape[0] != old_result_len:
         data_result_df = data_result_df.sort_values(by='time', ascending=True)
         old_result_len = data_result_df.shape[0]
-        print(data_result_df)
-        print(old_result_len)
+        # print(data_result_df)
+        # print(old_result_len)
 
         file_name = str(uuid.uuid1())
         plot_result(data, data_result_df, file_name)

@@ -36,7 +36,7 @@ docker run -ti zhangsheng377/stock
 docker run -ti zhangsheng377/stock /bin/bash
 docker run -ti -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro zhangsheng377/stock
 
-docker run -d -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/stock
+docker run -d --name stock -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/stock
 ```
 
 ## save_policies
