@@ -38,3 +38,13 @@ docker run -ti -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtim
 
 docker run -d -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/stock
 ```
+
+## save_policies
+
+```
+docker build -t zhangsheng377/save_policies -f Dockerfile_policy .
+
+docker run -ti -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro zhangsheng377/save_policies
+
+docker run -d --name save_policies -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/save_policies
+```
