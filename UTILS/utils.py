@@ -61,4 +61,4 @@ def send_result(stock_id, data, result_list, ftqq_token, old_result_len):
                                       "%Y-%m-%d %H:%M:%S")})
         print(res.text)
 
-    return old_result_len
+    return data_result_df.shape[0]

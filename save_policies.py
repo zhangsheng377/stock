@@ -41,11 +41,13 @@ def func_stock(stock_id):
 def func_policy(stock_id, policy_name):
     with stock_policy_locks[stock_id][policy_name]:
         try:
-            data = get_today_tick_data(db_sheets[stock_id])
+            data = json.loads(db_redis.get(stock_id))
 
             if len(data) > 0:
                 result_list = policies[policy_name](data)
                 db_redis.set(stock_id + '_' + policy_name, json.dumps(result_list))
+            else:
+                db_redis.set(stock_id + '_' + policy_name, json.dumps([]))
 
         except Exception as e:
             logging.warning("save policy error.", e)
