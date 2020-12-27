@@ -6,15 +6,15 @@ import time
 from datetime import datetime
 
 from UTILS.utils import send_result
-from ftqq_tokens import users
 from db_sheets import db_redis
-from policies import policies
 
-VERSION = "0.0.8"
+VERSION = "0.0.10"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
 user_stock_locks = {}
+
+users = json.loads(db_redis.get('users'))
 
 
 def func(user_name, stock_id, old_result_len):
@@ -23,7 +23,7 @@ def func(user_name, stock_id, old_result_len):
             data = get_stock_data(stock_id)
 
             result_list = []
-            for (policy_name, _) in policies.items():
+            for policy_name in users[user_name]['policies']:
                 result_list.extend(get_policy_data(stock_id, policy_name))
 
             old_result_len = send_result(stock_id, data, result_list, users[user_name]['ftqq_token'], old_result_len)
