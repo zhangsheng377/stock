@@ -32,6 +32,7 @@ def plot_result(data, data_result_df, file_name):
         os.makedirs('tmp')
     plt.savefig(os.path.join('tmp', file_name))
     plt.close()
+
     upload(file_name + ".png")
 
 
@@ -44,7 +45,10 @@ def send_result(stock_id, data, result_list, ftqq_token, old_result_len):
         # print(old_result_len)
 
         file_name = str(uuid.uuid1())
-        plot_result(data, data_result_df, file_name)
+        try:
+            plot_result(data, data_result_df, file_name)
+        except Exception as e:
+            print(e)
 
         data_result_df[' '] = '&nbsp;&nbsp;&nbsp;&nbsp;'
         data_result_df = data_result_df[['time', ' ', 'price', ' ', '指标']]
