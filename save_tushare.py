@@ -60,7 +60,7 @@ def func(stock_id, last_time):
                 print(data_json)
                 insert_result = db_sheets[stock_id].insert(data_json)
                 if insert_result:
-                    print('评论插入成功\n')
+                    print('插入成功\n')
                 else:
                     print('已经存在于数据库\n')
         except Exception as e:
