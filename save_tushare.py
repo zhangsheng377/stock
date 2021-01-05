@@ -49,8 +49,9 @@ def func(stock_id, last_time):
         try:
             df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
             data_dict = df.to_dict()
+            data_price = data_dict['price'][0]
             data_time = data_dict['time'][0]
-            if data_time != last_time:
+            if data_price != "0.000" and data_time != last_time:
                 last_time = data_time
 
                 data_json_str = df.to_json(orient='records')[1:-1]
