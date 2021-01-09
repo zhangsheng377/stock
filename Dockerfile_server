@@ -7,7 +7,7 @@ RUN apt clean && apt update && apt install git python3 python3-pip -y
 RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 RUN pip3 install Flask gunicorn xmltodict
 
-RUN git clone https://github.com/zhangsheng377/stock.git
+RUN git clone https://github.com/zhangsheng377/stock.git --depth=1
 
 WORKDIR /stock
 

@@ -66,5 +66,5 @@ docker build -t zhangsheng377/server -f Dockerfile_server .
 
 docker run -ti -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro zhangsheng377/server  /bin/bash
 
-docker run -d --name server -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/server
+docker run -d --name server -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro -p 5000:5000 --restart always zhangsheng377/server
 ```
