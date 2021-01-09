@@ -48,3 +48,23 @@ docker run -ti -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtim
 
 docker run -d --name save_policies -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/save_policies
 ```
+
+## 部署花生壳 phddns
+
+```
+docker build -t zhangsheng377/phddns -f Dockerfile_phddns .
+
+docker run -ti -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro zhangsheng377/phddns  /bin/bash
+
+docker run -d --name phddns -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/phddns
+```
+
+## 部署微信服务器
+
+```
+docker build -t zhangsheng377/server -f Dockerfile_server .
+
+docker run -ti -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro zhangsheng377/server  /bin/bash
+
+docker run -d --name server -v /etc/timezone:/etc/timezone:ro -v /etc/localtime:/etc/localtime:ro --restart always zhangsheng377/server
+```
