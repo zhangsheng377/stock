@@ -4,6 +4,8 @@ import xmltodict
 import time
 import re
 
+from func import send_one
+
 application = Flask(__name__)
 
 
@@ -38,9 +40,18 @@ def get():
             if content == "清除缓存":
                 re_content = "缓存已清除"
             elif re.fullmatch(r'\d{6}\.\w{2}', content):
-                re_content = content
+                re_content = "code: " + content
+            elif content.startswith("发送"):
+                try:
+                    datas = content.split(" ")
+                    user_name = datas[1]
+                    stock_id = datas[2]
+                    re_len = send_one(user_name, stock_id)
+                    re_content = "发送成功: {} {} {}".format(user_name, stock_id, re_len)
+                except Exception as e:
+                    re_content = "发送失败：" + str(e)
             else:
-                re_content = "请输入 002581.SZ 这样格式的股票代码"
+                re_content = content
 
         if not resp_dict:
             # 构造返回值，经由微信服务器回复给用户的消息内容
