@@ -1,0 +1,31 @@
+version: "2.4"
+services:
+  save_tushare:
+    image: zhangsheng377/save_tushare
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+  stock:
+    image: zhangsheng377/stock
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+  save_policies:
+    image: zhangsheng377/save_policies
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+
+  server:
+    image: zhangsheng377/server
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "5000:5000"
