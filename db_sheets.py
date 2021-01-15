@@ -16,6 +16,11 @@ db_sheets = {
     "300999": database_factory(database_name="tushare", sheet_name="sh_300999", model="pymongo"),
 }
 
+
+def get_db_sheet(database_name, sheet_name):
+    return database_factory(database_name=database_name, sheet_name=sheet_name, model="pymongo")
+
+
 stock_name_map = {
     "600196": "复星医药",
     "600511": "国药股份",
@@ -28,6 +33,6 @@ stock_name_map = {
     "300999": "金龙鱼",
 }
 
-db_redis = redis.Redis(host='192.168.10.5', port=6379, db=0)
+db_redis = redis.Redis(host='localhost', port=6379, db=0)
 
 db_redis.set("stock_name_map", json.dumps(stock_name_map))

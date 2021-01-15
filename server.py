@@ -5,11 +5,12 @@ import time
 import re
 
 from func import send_one
+from db_sheets import get_db_sheet
 
 application = Flask(__name__)
-
-
 # application.debug = True
+
+user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
 
 
 @application.route('/')
@@ -41,15 +42,31 @@ def get():
                 re_content = "缓存已清除"
             elif re.fullmatch(r'\d{6}\.\w{2}', content):
                 re_content = "code: " + content
-            elif content.startswith("发送"):
+            elif content.startswith("查询 "):
                 try:
                     datas = content.split(" ")
-                    user_name = datas[1]
-                    stock_id = datas[2]
-                    re_len = send_one(user_name, stock_id)
-                    re_content = "发送成功: {} {} {}".format(user_name, stock_id, re_len)
+                    stock_id = datas[1]
+                    result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
+                    if result:
+                        user_name = result[0]['_id']
+                        re_len = send_one(user_name, stock_id)
+                        re_content = "发送成功: {} {} {}".format(user_name, stock_id, re_len)
+                    else:
+                        re_content = "尚未绑定"
                 except Exception as e:
                     re_content = "发送失败：" + str(e)
+            elif content.startswith("绑定 "):
+                datas = content.split(" ")
+                user_name = datas[1]
+                if user_db_sheet.find(filter={'_id': user_name}):
+                    re_content = "您要绑定的用户名:{}，已被人绑定!请联系微信435878393".format(user_name)
+                elif user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")}):
+                    re_content = "您的微信已被绑定!请联系微信435878393"
+                else:
+                    if user_db_sheet.insert({'_id': user_name, 'wechat': xml_dict.get("FromUserName")}):
+                        re_content = "绑定成功"
+                    else:
+                        re_content = "绑定失败"
             else:
                 re_content = content
 
