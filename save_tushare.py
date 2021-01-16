@@ -77,7 +77,8 @@ def discover_stock():
     stock_names = database.list_collection_names(filter={"name": re.compile('^sh_\d{6}')})
     for stock_name in stock_names:
         stock_id = stock_name[3:]
-        if stock_name not in stock_locks:
+        if stock_id not in stock_locks:
+            print("add stock:", stock_id)
             stock_locks[stock_id] = threading.Lock()
             schdule.enter(0, 0, func, (stock_id, None))
     schdule.enter(10, 0, discover_stock, )
