@@ -34,3 +34,6 @@ class DataBasePyMongo(DataBase):
 
     def delete(self, filter):
         return self._sheet.delete_many(filter=filter)
+
+    def get_database(self):
+        return self._databese

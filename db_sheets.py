@@ -23,4 +23,5 @@ stock_name_map = {
 
 db_redis = redis.Redis(host='192.168.10.5', port=6379, db=0)
 
-db_redis.set("stock_name_map", json.dumps(stock_name_map))
+if __name__ == "__main__":
+    db_redis.set("stock_name_map", json.dumps(stock_name_map))

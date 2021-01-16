@@ -4,12 +4,13 @@ import sched
 import threading
 import time
 from datetime import datetime
+import re
 
 import tushare as ts
 
-from db_sheets import get_db_sheet, stock_name_map
+from db_sheets import get_db_sheet
 
-VERSION = "0.0.6"
+VERSION = "0.0.7"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
@@ -71,8 +72,18 @@ def func(stock_id, last_time):
         schdule.enter(1, 0, func, (stock_id, last_time))
 
 
-print(VERSION)
-for stock_id in stock_name_map.keys():
-    stock_locks[stock_id] = threading.Lock()
-    schdule.enter(0, 0, func, (stock_id, None))
-schdule.run()
+def discover_stock():
+    database = get_db_sheet(database_name="tushare", sheet_name="sh_600196").get_database()
+    stock_names = database.list_collection_names(filter={"name": re.compile('^sh_\d{6}')})
+    for stock_name in stock_names:
+        if stock_name not in stock_locks:
+            stock_id = stock_name[3:]
+            stock_locks[stock_id] = threading.Lock()
+            schdule.enter(0, 0, func, (stock_id, None))
+    schdule.enter(10, 0, discover_stock, )
+
+
+if __name__ == "__main__":
+    print(VERSION)
+    schdule.enter(0, 0, discover_stock, )
+    schdule.run()
