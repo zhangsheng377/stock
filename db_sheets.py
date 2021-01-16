@@ -4,18 +4,6 @@ import redis
 
 from DATABASE import database_factory
 
-db_sheets = {
-    "600196": database_factory(database_name="tushare", sheet_name="sh_600196", model="pymongo"),
-    "600511": database_factory(database_name="tushare", sheet_name="sh_600511", model="pymongo"),
-    "601012": database_factory(database_name="tushare", sheet_name="sh_601012", model="pymongo"),
-    "600559": database_factory(database_name="tushare", sheet_name="sh_600559", model="pymongo"),
-    "688123": database_factory(database_name="tushare", sheet_name="sh_688123", model="pymongo"),
-    "300815": database_factory(database_name="tushare", sheet_name="sh_300815", model="pymongo"),
-    "300719": database_factory(database_name="tushare", sheet_name="sh_300719", model="pymongo"),
-    "600519": database_factory(database_name="tushare", sheet_name="sh_600519", model="pymongo"),
-    "300999": database_factory(database_name="tushare", sheet_name="sh_300999", model="pymongo"),
-}
-
 
 def get_db_sheet(database_name, sheet_name):
     return database_factory(database_name=database_name, sheet_name=sheet_name, model="pymongo")

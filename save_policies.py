@@ -5,10 +5,10 @@ import threading
 import time
 from datetime import datetime
 
-from db_sheets import db_sheets, db_redis
+from db_sheets import db_redis, get_db_sheet, stock_name_map
 from policies import policies
 
-VERSION = "0.0.1"
+VERSION = "0.0.2"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
@@ -28,7 +28,8 @@ def get_today_tick_data(db_sheet):
 def func_stock(stock_id):
     with stock_locks[stock_id]:
         try:
-            data = get_today_tick_data(db_sheets[stock_id])
+            db_sheet = get_db_sheet(database_name="tushare", sheet_name="sh_" + stock_id)
+            data = get_today_tick_data(db_sheet)
 
             db_redis.set(stock_id, json.dumps(data))
         except Exception as e:
@@ -57,7 +58,7 @@ def func_policy(stock_id, policy_name):
 
 
 print(VERSION)
-for (stock_id, _) in db_sheets.items():
+for stock_id in stock_name_map.keys():
     stock_locks[stock_id] = threading.Lock()
     schdule.enter(0, 0, func_stock, (stock_id,))
 

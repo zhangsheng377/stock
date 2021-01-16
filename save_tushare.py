@@ -7,9 +7,9 @@ from datetime import datetime
 
 import tushare as ts
 
-from db_sheets import db_sheets
+from db_sheets import get_db_sheet, stock_name_map
 
-VERSION = "0.0.5"
+VERSION = "0.0.6"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
@@ -59,8 +59,8 @@ def func(stock_id, last_time):
 
                 data_json['_id'] = data_json['date'] + " " + data_json['time']
                 print(data_json)
-                insert_result = db_sheets[stock_id].insert(data_json)
-                if insert_result:
+                db_sheet = get_db_sheet(database_name="tushare", sheet_name="sh_" + stock_id)
+                if db_sheet.insert(data_json):
                     print('插入成功\n')
                 else:
                     print('已经存在于数据库\n')
@@ -72,7 +72,7 @@ def func(stock_id, last_time):
 
 
 print(VERSION)
-for stock_id in db_sheets.keys():
+for stock_id in stock_name_map.keys():
     stock_locks[stock_id] = threading.Lock()
     schdule.enter(0, 0, func, (stock_id, None))
 schdule.run()
