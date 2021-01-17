@@ -30,7 +30,7 @@ class DataBasePyMongo(DataBase):
 
     # 未经测试
     def update_one(self, filter, update):
-        return self._sheet.insert_one(filter=filter, update=update)
+        return self._sheet.update_one(filter=filter, update=update)
 
     def delete(self, filter):
         return self._sheet.delete_many(filter=filter)

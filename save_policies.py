@@ -8,7 +8,7 @@ from datetime import datetime
 from db_sheets import db_redis, get_db_sheet
 from policies import policies
 
-VERSION = "0.0.3"
+VERSION = "0.0.4"
 
 schdule = sched.scheduler(time.time, time.sleep)
 

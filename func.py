@@ -6,15 +6,15 @@ import time
 from datetime import datetime
 
 from UTILS.utils import send_result
-from db_sheets import db_redis
+from db_sheets import db_redis, get_db_sheet
 
-VERSION = "0.0.10"
+VERSION = "0.0.11"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
 user_stock_locks = {}
 
-users = json.loads(db_redis.get('users'))
+users = {}
 
 
 def func(user_name, stock_id, old_result_len):
@@ -52,12 +52,31 @@ def send_one(user_name, stock_id):
         result_list.extend(get_policy_data(stock_id, policy_name))
     return send_result(stock_id, data, result_list, users[user_name]['ftqq_token'], 0)
 
+def discover_user():
+    try:
+        for (user_name, user_data) in users.items():
+            if user_name not in user_stock_locks:
+                user_stock_locks[user_name] = {}
+            for stock_id in user_data['stocks']:
+                if stock_id not in user_stock_locks[user_name]:
+                    user_stock_locks[user_name][stock_id] = threading.Lock()
+                    schdule.enter(0, 0, func, (user_name, stock_id, 0))
+    except Exception as e:
+        logging.warning("discover_stock error.", e)
+    schdule.enter(10, 0, discover_user, )
+
+def update_user():
+    try:
+        user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
+        for user in user_db_sheet.find():
+            users[user['_id']] = user
+        db_redis.set("users", json.dumps(users))
+    except Exception as e:
+        logging.warning("update_user error.", e)
+    schdule.enter(10, 0, update_user, )
 
 if __name__ == "__main__":
     print(VERSION)
-    for (user_name, user_data) in users.items():
-        user_stock_locks[user_name] = {}
-        for stock_id in user_data['stocks']:
-            user_stock_locks[user_name][stock_id] = threading.Lock()
-            schdule.enter(0, 0, func, (user_name, stock_id, 0))
+    schdule.enter(0, 0, update_user, )
+    schdule.enter(1, 0, discover_user, )
     schdule.run()
