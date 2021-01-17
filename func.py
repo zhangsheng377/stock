@@ -71,6 +71,7 @@ def discover_user():
             for stock_id in user_stock_events[user_name].keys():
                 if stock_id not in user_data['stocks']:
                     schdule.cancel(user_stock_events[user_name][stock_id])
+                    user_stock_events[user_name].pop(stock_id)
                     print("discover_user cancel {} {}".format(user_name, stock_id))
     except Exception as e:
         logging.warning("discover_stock error.", e)
