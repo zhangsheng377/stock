@@ -5,10 +5,10 @@ import threading
 import time
 from datetime import datetime
 
-from db_sheets import db_redis, get_db_sheet, stock_name_map
+from db_sheets import db_redis, get_db_sheet
 from policies import policies
 
-VERSION = "0.0.2"
+VERSION = "0.0.3"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
@@ -57,13 +57,26 @@ def func_policy(stock_id, policy_name):
         schdule.enter(1, 0, func_policy, (stock_id, policy_name))
 
 
-print(VERSION)
-for stock_id in stock_name_map.keys():
-    stock_locks[stock_id] = threading.Lock()
-    schdule.enter(0, 0, func_stock, (stock_id,))
+def discover_stock():
+    try:
+        stock_name_map = json.loads(db_redis.get("stock_name_map"))
+        for stock_id in stock_name_map.keys():
+            if stock_id not in stock_locks:
+                stock_locks[stock_id] = threading.Lock()
+                schdule.enter(0, 0, func_stock, (stock_id,))
 
-    stock_policy_locks[stock_id] = {}
-    for (policy_name, policy_handle) in policies.items():
-        stock_policy_locks[stock_id][policy_name] = threading.Lock()
-        schdule.enter(0, 0, func_policy, (stock_id, policy_name))
-schdule.run()
+            if stock_id not in stock_policy_locks:
+                stock_policy_locks[stock_id] = {}
+            for (policy_name, policy_handle) in policies.items():
+                if policy_name not in stock_policy_locks[stock_id]:
+                    stock_policy_locks[stock_id][policy_name] = threading.Lock()
+                    schdule.enter(0, 0, func_policy, (stock_id, policy_name))
+    except Exception as e:
+        logging.warning("discover_stock error.", e)
+    schdule.enter(10, 0, discover_stock, )
+
+
+if __name__ == "__main__":
+    print(VERSION)
+    schdule.enter(0, 0, discover_stock, )
+    schdule.run()

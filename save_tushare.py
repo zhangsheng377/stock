@@ -8,13 +8,15 @@ import re
 
 import tushare as ts
 
-from db_sheets import get_db_sheet
+from db_sheets import get_db_sheet, db_redis
 
-VERSION = "0.0.7"
+VERSION = "0.0.8"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
 stock_locks = {}
+
+stock_name_map = {}
 
 '''
 0：name，股票名字
@@ -73,14 +75,21 @@ def func(stock_id, last_time):
 
 
 def discover_stock():
-    database = get_db_sheet(database_name="tushare", sheet_name="sh_600196").get_database()
-    stock_names = database.list_collection_names(filter={"name": re.compile('^sh_\d{6}')})
-    for stock_name in stock_names:
-        stock_id = stock_name[3:]
-        if stock_id not in stock_locks:
-            print("add stock:", stock_id)
-            stock_locks[stock_id] = threading.Lock()
-            schdule.enter(0, 0, func, (stock_id, None))
+    try:
+        database = get_db_sheet(database_name="tushare", sheet_name="sh_600196").get_database()
+        stock_names = database.list_collection_names(filter={"name": re.compile('^sh_\d{6}')})
+        for stock_name in stock_names:
+            stock_id = stock_name[3:]
+            if stock_id not in stock_locks:
+                print("add stock:", stock_id)
+                db_sheet = get_db_sheet(database_name="tushare", sheet_name=stock_name)
+                data_one = db_sheet.find_one()
+                stock_name_map[stock_id] = data_one['name']
+                db_redis.set("stock_name_map", json.dumps(stock_name_map))
+                stock_locks[stock_id] = threading.Lock()
+                schdule.enter(0, 0, func, (stock_id, None))
+    except Exception as e:
+        logging.warning("discover_stock error.", e)
     schdule.enter(10, 0, discover_stock, )
 
 
