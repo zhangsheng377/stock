@@ -55,7 +55,7 @@ def get():
                     result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
                     if result:
                         user_name = result[0]['_id']
-                        re_len = send_one(user_name, stock_id)
+                        re_len = send_one(result[0], stock_id)
                         re_content = "发送成功: {} {} {}".format(user_name, stock_id, re_len)
                     else:
                         re_content = "尚未绑定微信"

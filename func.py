@@ -7,6 +7,7 @@ from datetime import datetime
 
 from UTILS.utils import send_result
 from db_sheets import db_redis, get_db_sheet
+from  save_tushare import add_stock
 
 VERSION = "0.0.11"
 
@@ -39,19 +40,26 @@ def func(user_name, stock_id, old_result_len):
 
 
 def get_stock_data(stock_id):
-    return json.loads(db_redis.get(stock_id))
+    data = db_redis.get(stock_id)
+    if data is None:
+        data = '[]'
+    return json.loads(data)
 
 
 def get_policy_data(stock_id, policy_name):
-    return json.loads(db_redis.get(stock_id + '_' + policy_name))
+    data = db_redis.get(stock_id + '_' + policy_name)
+    if data is None:
+        data = '[]'
+    return json.loads(data)
 
 
-def send_one(user_name, stock_id):
+def send_one(user, stock_id):
+    print(user, stock_id)
     data = get_stock_data(stock_id)
     result_list = []
-    for policy_name in users[user_name]['policies']:
+    for policy_name in user['policies']:
         result_list.extend(get_policy_data(stock_id, policy_name))
-    return send_result(stock_id, data, result_list, users[user_name]['ftqq_token'], 0)
+    return send_result(stock_id, data, result_list, user['ftqq_token'], 0)
 
 
 def discover_user():
@@ -66,6 +74,7 @@ def discover_user():
                 if stock_id not in user_stock_locks[user_name]:
                     user_stock_locks[user_name][stock_id] = threading.Lock()
                     user_stock_events[user_name][stock_id] = schdule.enter(0, 0, func, (user_name, stock_id, 0))
+                    add_stock(stock_id, None)
                     print("discover_user add {} {}".format(user_name, stock_id))
 
             while True:

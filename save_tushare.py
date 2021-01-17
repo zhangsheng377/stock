@@ -47,26 +47,38 @@ stock_name_map = {}
 '''
 
 
+def add_stock(stock_id, last_time):
+    try:
+        df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
+        data_dict = df.to_dict()
+        data_price = data_dict['price'][0]
+        data_time = data_dict['time'][0]
+        if data_price != "0.000" and data_time != last_time:
+            last_time = data_time
+
+            data_json_str = df.to_json(orient='records')[1:-1]
+            data_json = json.loads(data_json_str)
+
+            data_json['_id'] = data_json['date'] + " " + data_json['time']
+            print(data_json)
+            db_sheet = get_db_sheet(database_name="tushare", sheet_name="sh_" + stock_id)
+            if db_sheet.insert(data_json):
+                return last_time
+            else:
+                return None
+    except Exception as e:
+        logging.warning("add_stock error.", e)
+    return None
+
+
 def func(stock_id, last_time):
     with stock_locks[stock_id]:
         try:
-            df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
-            data_dict = df.to_dict()
-            data_price = data_dict['price'][0]
-            data_time = data_dict['time'][0]
-            if data_price != "0.000" and data_time != last_time:
-                last_time = data_time
-
-                data_json_str = df.to_json(orient='records')[1:-1]
-                data_json = json.loads(data_json_str)
-
-                data_json['_id'] = data_json['date'] + " " + data_json['time']
-                print(data_json)
-                db_sheet = get_db_sheet(database_name="tushare", sheet_name="sh_" + stock_id)
-                if db_sheet.insert(data_json):
-                    print('插入成功\n')
-                else:
-                    print('已经存在于数据库\n')
+            last_time = add_stock(stock_id, last_time)
+            if last_time is not None:
+                print('插入成功\n')
+            else:
+                print('已经存在于数据库\n')
         except Exception as e:
             logging.warning("save tushare error.", e)
 
