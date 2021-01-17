@@ -8,7 +8,7 @@ COPY ta-lib-0.4.0-src.tar.gz ta-lib-0.4.0-src.tar.gz
 RUN tar -zxvf ta-lib-0.4.0-src.tar.gz && cd /ta-lib && ./configure --prefix=/usr && make && make install
 
 RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-RUN pip3 install numpy pandas requests TA-Lib tabulate pymongo matplotlib qiniu redis
+RUN pip3 install numpy pandas requests TA-Lib tabulate pymongo matplotlib qiniu redis tushare
 
 RUN git clone https://github.com/zhangsheng377/stock.git
 COPY UTILS/config_qiniu.py /stock/UTILS/config_qiniu.py

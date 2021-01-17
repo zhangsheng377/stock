@@ -63,19 +63,19 @@ def add_stock(stock_id, last_time):
             print(data_json)
             db_sheet = get_db_sheet(database_name="tushare", sheet_name="sh_" + stock_id)
             if db_sheet.insert(data_json):
-                return last_time
+                return last_time, True
             else:
-                return None
+                return last_time, False
     except Exception as e:
         logging.warning("add_stock error.", e)
-    return None
+    return last_time, False
 
 
 def func(stock_id, last_time):
     with stock_locks[stock_id]:
         try:
-            last_time = add_stock(stock_id, last_time)
-            if last_time is not None:
+            last_time, result = add_stock(stock_id, last_time)
+            if result:
                 print('插入成功\n')
             else:
                 print('已经存在于数据库\n')
