@@ -35,7 +35,7 @@ def func(user_name, stock_id, old_result_len):
                 logging.warning("handle data error.", e)
 
         print(datetime.now())
-        schdule.enter(1, 0, func, (user_name, stock_id, old_result_len))
+        user_stock_events[user_name][stock_id] = schdule.enter(1, 0, func, (user_name, stock_id, old_result_len))
 
 
 def get_stock_data(stock_id):
@@ -68,11 +68,18 @@ def discover_user():
                     user_stock_events[user_name][stock_id] = schdule.enter(0, 0, func, (user_name, stock_id, 0))
                     print("discover_user add {} {}".format(user_name, stock_id))
 
-            for stock_id in user_stock_events[user_name].keys():
-                if stock_id not in user_data['stocks']:
-                    schdule.cancel(user_stock_events[user_name][stock_id])
-                    user_stock_events[user_name].pop(stock_id)
-                    print("discover_user cancel {} {}".format(user_name, stock_id))
+            while True:
+                is_change = False
+                for stock_id in user_stock_events[user_name].keys():
+                    if stock_id not in user_data['stocks']:
+                        schdule.cancel(user_stock_events[user_name][stock_id])
+                        user_stock_events[user_name].pop(stock_id)
+                        user_stock_locks[user_name].pop(stock_id)
+                        is_change = True
+                        print("discover_user cancel {} {}".format(user_name, stock_id))
+                        break
+                if not is_change:
+                    break
     except Exception as e:
         logging.warning("discover_stock error.", e)
     schdule.enter(10, 0, discover_user, )
