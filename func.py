@@ -66,10 +66,12 @@ def discover_user():
                 if stock_id not in user_stock_locks[user_name]:
                     user_stock_locks[user_name][stock_id] = threading.Lock()
                     user_stock_events[user_name][stock_id] = schdule.enter(0, 0, func, (user_name, stock_id, 0))
+                    print("discover_user add {} {}".format(user_name, stock_id))
 
             for stock_id in user_stock_events[user_name].keys():
                 if stock_id not in user_data['stocks']:
                     schdule.cancel(user_stock_events[user_name][stock_id])
+                    print("discover_user cancel {} {}".format(user_name, stock_id))
     except Exception as e:
         logging.warning("discover_stock error.", e)
     schdule.enter(10, 0, discover_user, )
