@@ -40,6 +40,12 @@ def get():
             content = xml_dict.get("Content")
             if content == "清除缓存":
                 re_content = "缓存已清除"
+            elif content == "查询已订阅股票":
+                result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
+                if result:
+                    re_content = str(result[0]['stocks'])
+                else:
+                    re_content = "尚未绑定微信"
             elif re.fullmatch(r'\d{6}\.\w{2}', content):
                 re_content = "code: " + content
             elif content.startswith("查询 "):
@@ -52,12 +58,13 @@ def get():
                         re_len = send_one(user_name, stock_id)
                         re_content = "发送成功: {} {} {}".format(user_name, stock_id, re_len)
                     else:
-                        re_content = "尚未绑定"
+                        re_content = "尚未绑定微信"
                 except Exception as e:
                     re_content = "发送失败：" + str(e)
             elif content.startswith("绑定 "):
                 datas = content.split(" ")
                 user_name = datas[1]
+                # 此处逻辑需要细考
                 if user_db_sheet.find(filter={'_id': user_name}):
                     re_content = "您要绑定的用户名:{}，已被人绑定!请联系微信435878393".format(user_name)
                 elif user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")}):
@@ -67,6 +74,30 @@ def get():
                         re_content = "绑定成功"
                     else:
                         re_content = "绑定失败"
+            elif content.startswith("订阅 "):
+                datas = content.split(" ")
+                stock_id = datas[1]
+                result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
+                if result:
+                    stocks = set(result[0]['stocks'])
+                    stocks.add(stock_id)
+                    user_db_sheet.update_one(filter={'wechat': xml_dict.get("FromUserName")},
+                                             update={'$set': {'stocks': list(stocks)}})
+                    re_content = "订阅成功"
+                else:
+                    re_content = "尚未绑定微信"
+            elif content.startswith("取消订阅 "):
+                datas = content.split(" ")
+                stock_id = datas[1]
+                result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
+                if result:
+                    stocks = set(result[0]['stocks'])
+                    stocks.remove(stock_id)
+                    user_db_sheet.update_one(filter={'wechat': xml_dict.get("FromUserName")},
+                                             update={'$set': {'stocks': list(stocks)}})
+                    re_content = "取消订阅成功"
+                else:
+                    re_content = "尚未绑定微信"
             else:
                 re_content = content
 
