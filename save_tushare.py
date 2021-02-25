@@ -74,11 +74,13 @@ def add_stock(stock_id, last_time):
 def func(stock_id, last_time):
     with stock_locks[stock_id]:
         try:
-            last_time, result = add_stock(stock_id, last_time)
-            if result:
-                print('插入成功\n')
-            else:
-                print('已经存在于数据库\n')
+            now_hour = int(datetime.now().strftime('%H'))
+            if 8 <= now_hour <= 16:
+                last_time, result = add_stock(stock_id, last_time)
+                if result:
+                    print('插入成功\n')
+                else:
+                    print('已经存在于数据库\n')
         except Exception as e:
             logging.warning("save tushare error.", e)
 

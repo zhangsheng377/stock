@@ -22,13 +22,15 @@ users = {}
 def func(user_name, stock_id, old_result_len):
     with user_stock_locks[user_name][stock_id]:
         try:
-            data = get_stock_data(stock_id)
+            now_hour = int(datetime.now().strftime('%H'))
+            if 8 <= now_hour <= 16:
+                data = get_stock_data(stock_id)
 
-            result_list = []
-            for policy_name in users[user_name]['policies']:
-                result_list.extend(get_policy_data(stock_id, policy_name))
+                result_list = []
+                for policy_name in users[user_name]['policies']:
+                    result_list.extend(get_policy_data(stock_id, policy_name))
 
-            old_result_len = send_result(stock_id, data, result_list, users[user_name]['ftqq_token'], old_result_len)
+                old_result_len = send_result(stock_id, data, result_list, users[user_name]['ftqq_token'], old_result_len)
         except Exception as e:
             if e.args[0] == 'data_df is empty':
                 logging.info("data_df is empty.")

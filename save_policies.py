@@ -28,10 +28,12 @@ def get_today_tick_data(db_sheet):
 def func_stock(stock_id):
     with stock_locks[stock_id]:
         try:
-            db_sheet = get_db_sheet(database_name="tushare", sheet_name="sh_" + stock_id)
-            data = get_today_tick_data(db_sheet)
+            now_hour = int(datetime.now().strftime('%H'))
+            if 8 <= now_hour <= 16:
+                db_sheet = get_db_sheet(database_name="tushare", sheet_name="sh_" + stock_id)
+                data = get_today_tick_data(db_sheet)
 
-            db_redis.set(stock_id, json.dumps(data))
+                db_redis.set(stock_id, json.dumps(data))
         except Exception as e:
             logging.warning("save data error.", e)
 
@@ -42,13 +44,15 @@ def func_stock(stock_id):
 def func_policy(stock_id, policy_name):
     with stock_policy_locks[stock_id][policy_name]:
         try:
-            data = json.loads(db_redis.get(stock_id))
+            now_hour = int(datetime.now().strftime('%H'))
+            if 8 <= now_hour <= 16:
+                data = json.loads(db_redis.get(stock_id))
 
-            if len(data) > 0:
-                result_list = policies[policy_name](data)
-                db_redis.set(stock_id + '_' + policy_name, json.dumps(result_list))
-            else:
-                db_redis.set(stock_id + '_' + policy_name, json.dumps([]))
+                if len(data) > 0:
+                    result_list = policies[policy_name](data)
+                    db_redis.set(stock_id + '_' + policy_name, json.dumps(result_list))
+                else:
+                    db_redis.set(stock_id + '_' + policy_name, json.dumps([]))
 
         except Exception as e:
             logging.warning("save policy error.", e)
