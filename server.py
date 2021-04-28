@@ -89,7 +89,10 @@ def get():
                 stock_id = datas[1]
                 result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
                 if result:
-                    stocks = set(result[0]['stocks'])
+                    data = result[0]
+                    if 'stocks' not in data.keys():
+                        data['stocks'] = []
+                    stocks = set(data['stocks'])
                     stocks.add(stock_id)
                     user_db_sheet.update_one(filter={'wechat': xml_dict.get("FromUserName")},
                                              update={'$set': {'stocks': list(stocks)}})
@@ -101,11 +104,17 @@ def get():
                 stock_id = datas[1]
                 result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
                 if result:
-                    stocks = set(result[0]['stocks'])
-                    stocks.remove(stock_id)
-                    user_db_sheet.update_one(filter={'wechat': xml_dict.get("FromUserName")},
-                                             update={'$set': {'stocks': list(stocks)}})
-                    re_content = "取消订阅成功"
+                    data = result[0]
+                    if 'stocks' not in data.keys():
+                        data['stocks'] = []
+                    stocks = set(data['stocks'])
+                    if stock_id in stocks:
+                        stocks.remove(stock_id)
+                        user_db_sheet.update_one(filter={'wechat': xml_dict.get("FromUserName")},
+                                                 update={'$set': {'stocks': list(stocks)}})
+                        re_content = "取消订阅成功"
+                    else:
+                        re_content = f"尚未订阅{stock_id}"
                 else:
                     re_content = "尚未绑定微信"
             elif content.startswith("下载 "):
