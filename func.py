@@ -7,7 +7,7 @@ from datetime import datetime
 
 from UTILS.utils import send_result
 from db_sheets import db_redis, get_db_sheet
-from  save_tushare import add_stock
+from save_tushare import add_stock
 
 VERSION = "0.0.11"
 
@@ -30,7 +30,8 @@ def func(user_name, stock_id, old_result_len):
                 for policy_name in users[user_name]['policies']:
                     result_list.extend(get_policy_data(stock_id, policy_name))
 
-                old_result_len = send_result(stock_id, data, result_list, users[user_name]['ftqq_token'], old_result_len)
+                old_result_len = send_result(stock_id, data, result_list, users[user_name]['ftqq_token'],
+                                             old_result_len)
         except Exception as e:
             if e.args[0] == 'data_df is empty':
                 logging.info("data_df is empty.")

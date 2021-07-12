@@ -12,8 +12,6 @@ import config_aria2
 application = Flask(__name__)
 # application.debug = True
 
-user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
-
 aria2 = aria2p.API(
     aria2p.Client(
         host=config_aria2.aria2_host,
@@ -51,6 +49,7 @@ def get():
             if content == "清除缓存":
                 re_content = "缓存已清除"
             elif content == "查询已订阅股票":
+                user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
                 result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
                 if result:
                     re_content = str(result[0]['stocks'])
@@ -62,6 +61,7 @@ def get():
                 try:
                     datas = content.split(" ")
                     stock_id = datas[1]
+                    user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
                     result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
                     if result:
                         user_name = result[0]['_id']
@@ -75,6 +75,7 @@ def get():
                 datas = content.split(" ")
                 user_name = datas[1]
                 # 此处逻辑需要细考
+                user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
                 if user_db_sheet.find(filter={'_id': user_name}):
                     re_content = "您要绑定的用户名:{}，已被人绑定!请联系微信435878393".format(user_name)
                 elif user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")}):
@@ -87,6 +88,7 @@ def get():
             elif content.startswith("订阅 "):
                 datas = content.split(" ")
                 stock_id = datas[1]
+                user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
                 result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
                 if result:
                     data = result[0]
@@ -102,6 +104,7 @@ def get():
             elif content.startswith("取消订阅 "):
                 datas = content.split(" ")
                 stock_id = datas[1]
+                user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
                 result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
                 if result:
                     data = result[0]
