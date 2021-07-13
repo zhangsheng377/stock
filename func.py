@@ -80,18 +80,13 @@ def discover_user():
                     add_stock(stock_id, None)
                     print("discover_user add {} {}".format(user_name, stock_id))
 
-            while True:
-                is_change = False
-                for stock_id in user_stock_events[user_name].keys():
-                    if stock_id not in user_data['stocks']:
-                        schdule.cancel(user_stock_events[user_name][stock_id])
-                        user_stock_events[user_name].pop(stock_id)
-                        user_stock_locks[user_name].pop(stock_id)
-                        is_change = True
-                        print("discover_user cancel {} {}".format(user_name, stock_id))
-                        break
-                if not is_change:
-                    break
+            stock_ids = list(user_stock_events[user_name].keys())
+            for stock_id in stock_ids:
+                if stock_id not in user_data['stocks']:
+                    schdule.cancel(user_stock_events[user_name][stock_id])
+                    user_stock_events[user_name].pop(stock_id)
+                    user_stock_locks[user_name].pop(stock_id)
+                    print("discover_user cancel {} {}".format(user_name, stock_id))
     except Exception as e:
         logging.warning("discover_stock error.", e)
     schdule.enter(10, 0, discover_user, )
