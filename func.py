@@ -68,6 +68,9 @@ def send_one(user, stock_id):
 def discover_user():
     try:
         for (user_name, user_data) in users.items():
+            if user_data['ftqq_token'] is None or user_data['ftqq_token'] == '':
+                continue
+
             if user_name not in user_stock_locks:
                 user_stock_locks[user_name] = {}
             if user_name not in user_stock_events:
