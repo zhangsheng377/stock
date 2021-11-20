@@ -12,7 +12,7 @@ RUN pip3 install numpy pandas requests TA-Lib tabulate pymongo matplotlib qiniu 
 
 RUN git clone https://github.com/zhangsheng377/stock.git
 COPY UTILS/config_qiniu.py /stock/UTILS/config_qiniu.py
-COPY ftqq_tokens.py /stock/ftqq_tokens.py
+# COPY ftqq_tokens.py /stock/ftqq_tokens.py
 
 WORKDIR /stock
 

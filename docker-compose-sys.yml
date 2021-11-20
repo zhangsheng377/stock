@@ -1,0 +1,27 @@
+version: "2.4"
+services:
+  redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /opt/docker/data/redis:/data
+    ports:
+      - "6379:6379"
+    logging:
+      options:
+        max-size: "10m"
+
+  mongo:
+    image: mongo:latest
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - /opt/docker/data/mongo:/data
+    ports:
+      - "27017:27017"
+    logging:
+      options:
+        max-size: "10m"

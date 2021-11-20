@@ -1,31 +1,43 @@
 version: "2.4"
 services:
   save_tushare:
-    image: zhangsheng377/save_tushare
+    image: zhangsheng377/save_tushare:latest
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: "10m"
 
   stock:
-    image: zhangsheng377/stock
+    image: zhangsheng377/stock:latest
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: "10m"
 
   save_policies:
-    image: zhangsheng377/save_policies
+    image: zhangsheng377/save_policies:latest
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: "10m"
 
   server:
-    image: zhangsheng377/server
+    image: zhangsheng377/server:latest
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
     ports:
       - "5000:5000"
+    logging:
+      options:
+        max-size: "10m"
