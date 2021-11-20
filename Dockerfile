@@ -23,9 +23,6 @@ secret_key = \"$QINIU_SECRET_KEY\" \n\
 db_redis.set(\"qiniu_access_key\", access_key)\n\
 db_redis.set(\"qiniu_secret_key\", secret_key)"\
 > /stock/UTILS/config_qiniu.py
-RUN CAT /stock/UTILS/config_qiniu.py
-# COPY UTILS/config_qiniu.py /stock/UTILS/config_qiniu.py
-# COPY ftqq_tokens.py /stock/ftqq_tokens.py
 
 WORKDIR /stock
 
