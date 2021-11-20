@@ -10,7 +10,9 @@ env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
   # <repo>
-  IMAGE_NAME: test
+  IMAGE_NAME: save_tushare
+  # DockerFile
+  DOCKER_FILE: Dockerfile_tushare
 
 
 jobs:
@@ -54,7 +56,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         context: .
-        file: Dockerfile_tushare
+        file: ${{ env.DOCKER_FILE }}
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}-${{ steps.time.outputs.time }}
         labels: ${{ steps.meta.outputs.labels }}
