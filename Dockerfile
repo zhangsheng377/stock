@@ -13,16 +13,17 @@ RUN pip3 install numpy pandas requests TA-Lib tabulate pymongo matplotlib qiniu 
 RUN git clone https://github.com/zhangsheng377/stock.git
 ARG QINIU_ACCESS_KEY QINIU_SECRET_KEY
 RUN echo "from db_sheets import db_redis\n\
-access_key = \"$QINIU_ACCESS_KEY\"\n\
-secret_key = \"$QINIU_SECRET_KEY\"\n\
+access_key = \"$QINIU_ACCESS_KEY\" \n\
+secret_key = \"$QINIU_SECRET_KEY\" \n\
 db_redis.set(\"qiniu_access_key\", access_key)\n\
 db_redis.set(\"qiniu_secret_key\", secret_key)"
 RUN echo "from db_sheets import db_redis\n\
-access_key = \"$QINIU_ACCESS_KEY\"\n\
-secret_key = \"$QINIU_SECRET_KEY\"\n\
+access_key = \"$QINIU_ACCESS_KEY\" \n\
+secret_key = \"$QINIU_SECRET_KEY\" \n\
 db_redis.set(\"qiniu_access_key\", access_key)\n\
 db_redis.set(\"qiniu_secret_key\", secret_key)"\
 > /stock/UTILS/config_qiniu.py
+RUN CAT /stock/UTILS/config_qiniu.py
 # COPY UTILS/config_qiniu.py /stock/UTILS/config_qiniu.py
 # COPY ftqq_tokens.py /stock/ftqq_tokens.py
 
