@@ -57,8 +57,9 @@ jobs:
       with:
         context: .
         file: ${{ env.DOCKER_FILE }}
-        build-args: QINIU_ACCESS_KEY=${{ secrets.QINIU_ACCESS_KEY }}
-        build-args: QINIU_SECRET_KEY=${{ secrets.QINIU_SECRET_KEY }}
+        build-args: 
+          QINIU_ACCESS_KEY: ${{ secrets.QINIU_ACCESS_KEY }}
+          QINIU_SECRET_KEY: ${{ secrets.QINIU_SECRET_KEY }}
         push: ${{ github.event_name != 'pull_request' }}
         # tags: ${{ steps.meta.outputs.tags }}-${{ steps.time.outputs.time }}
         tags: ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest
