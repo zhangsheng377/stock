@@ -11,7 +11,8 @@ RUN tar -zxvf ta-lib-0.4.0-src.tar.gz && cd /ta-lib && ./configure --prefix=/usr
 RUN pip3 install numpy pandas requests TA-Lib tabulate pymongo matplotlib qiniu redis tushare
 
 RUN git clone https://github.com/zhangsheng377/stock.git
-ARG QINIU_ACCESS_KEY QINIU_SECRET_KEY
+ARG QINIU_ACCESS_KEY
+ARG QINIU_SECRET_KEY
 RUN echo "from db_sheets import db_redis\n\
 access_key = \"$QINIU_ACCESS_KEY\" \n\
 secret_key = \"$QINIU_SECRET_KEY\" \n\
