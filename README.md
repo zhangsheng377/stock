@@ -15,6 +15,9 @@ mongo 127.0.0.1:27017
 show dbs
 use tushare
 db.sh_600196.insert({"test":"testdb"})
+
+mongodump -h 127.0.0.1:27017 -d tushare -o /data/mongodump/tushare
+mongorestore -h 127.0.0.1:27017 -d tushare --dir /data/mongodump/tushare
 ```
 
 ## save_tushare
