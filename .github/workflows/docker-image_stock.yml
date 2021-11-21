@@ -60,7 +60,7 @@ jobs:
         build-args: QINIU_ACCESS_KEY=${{ secrets.QINIU_ACCESS_KEY }} QINIU_SECRET_KEY=${{ secrets.QINIU_SECRET_KEY }}
         push: ${{ github.event_name != 'pull_request' }}
         # tags: ${{ steps.meta.outputs.tags }}-${{ steps.time.outputs.time }}
-        tags: latest
+        tags: ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest
         labels: ${{ steps.meta.outputs.labels }}
     
 #     - name: Build the Docker image
