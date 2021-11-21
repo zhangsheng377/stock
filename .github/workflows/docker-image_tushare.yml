@@ -59,6 +59,7 @@ jobs:
         file: ${{ env.DOCKER_FILE }}
         push: ${{ github.event_name != 'pull_request' }}
         # tags: ${{ steps.meta.outputs.tags }}-${{ steps.time.outputs.time }}
+        tags: latest
         labels: ${{ steps.meta.outputs.labels }}
     
 #     - name: Build the Docker image
