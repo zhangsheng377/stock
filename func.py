@@ -9,7 +9,7 @@ from UTILS.utils import send_result
 from db_sheets import db_redis, get_db_sheet
 from save_tushare import add_stock
 
-VERSION = "0.0.11"
+VERSION = "0.0.12"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
@@ -19,24 +19,29 @@ user_stock_events = {}
 users = {}
 
 
+def ftqq_token_is_valid(ftqq_token):
+    return ftqq_token is not None and ftqq_token != ''
+
+
 def func(user_name, stock_id, old_result_len):
     with user_stock_locks[user_name][stock_id]:
-        try:
-            now_hour = int(datetime.now().strftime('%H'))
-            if 8 <= now_hour <= 16:
-                data = get_stock_data(stock_id)
+        ftqq_token = users[user_name]['ftqq_token']
+        if ftqq_token_is_valid(ftqq_token):
+            try:
+                now_hour = int(datetime.now().strftime('%H'))
+                if 8 <= now_hour <= 16:
+                    data = get_stock_data(stock_id)
 
-                result_list = []
-                for policy_name in users[user_name]['policies']:
-                    result_list.extend(get_policy_data(stock_id, policy_name))
+                    result_list = []
+                    for policy_name in users[user_name]['policies']:
+                        result_list.extend(get_policy_data(stock_id, policy_name))
 
-                old_result_len = send_result(stock_id, data, result_list, users[user_name]['ftqq_token'],
-                                             old_result_len)
-        except Exception as e:
-            if e.args[0] == 'data_df is empty':
-                logging.info("data_df is empty.")
-            else:
-                logging.warning("handle data error.", e)
+                    old_result_len = send_result(stock_id, data, result_list, ftqq_token, old_result_len)
+            except Exception as e:
+                if e.args[0] == 'data_df is empty':
+                    logging.info("data_df is empty.")
+                else:
+                    logging.warning("handle data error.", e)
 
         print(datetime.now())
         user_stock_events[user_name][stock_id] = schdule.enter(1, 0, func, (user_name, stock_id, old_result_len))
