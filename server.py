@@ -70,7 +70,7 @@ def get():
                     else:
                         re_content = "尚未绑定微信"
                 except Exception as e:
-                    re_content = "发送失败：" + str(e)
+                    re_content = "发送失败: " + str(e)
                     application.logger.error(re_content)
             elif content.startswith("绑定 "):
                 datas = content.split(" ")
