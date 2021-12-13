@@ -1,21 +1,22 @@
 import pandas
 
+from UTILS.df_utils import get_minute_df
+
 
 def handel(data):
     data_df = pandas.DataFrame(data)
     if data_df.empty:
         raise Exception("data_df is empty")
 
-    data_df['minute'] = data_df['time'].str.slice(stop=5)
-    data_minute_df = data_df.drop_duplicates(subset=['minute'], keep='last')
+    data_minute_df = get_minute_df(data_df)
 
     result_list = []
 
     count = 0
     direction = 'none'
     for i in range(4, data_minute_df.shape[0]):
-        before = data_minute_df.iloc[i - 4]['price']
-        now = data_minute_df.iloc[i]['price']
+        before = data_minute_df.iloc[i - 4]['minute_price']
+        now = data_minute_df.iloc[i]['minute_price']
 
         if now > before:
             if direction == 'up':

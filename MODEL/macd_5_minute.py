@@ -2,6 +2,8 @@ import pandas
 import numpy
 import talib
 
+from UTILS.df_utils import get_minute_df
+
 
 def MACD_CN(close, fastperiod=12, slowperiod=26, signalperiod=9):
     macdDIFF, macdDEA, macd = talib.MACDEXT(close, fastperiod=fastperiod, fastmatype=1, slowperiod=slowperiod,
@@ -15,8 +17,7 @@ def handel(data):
     if data_df.empty:
         raise Exception("data_df is empty")
 
-    data_df['minute'] = data_df['time'].str.slice(stop=5)
-    data_minute_df = data_df.drop_duplicates(subset=['minute'], keep='last')
+    data_minute_df = get_minute_df(data_df)
 
     data_minute_df['tmp'] = data_minute_df['minute'].str.slice(start=4, stop=5)
     data_5_minute_df = pandas.concat([data_minute_df[data_minute_df['tmp'] == '0'],
