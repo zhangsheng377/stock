@@ -3,6 +3,7 @@ import os
 from qiniu import Auth, put_file
 
 from db_sheets import db_redis
+from UTILS import config_qiniu # 载入时会加载key
 
 
 def upload(file_name):
