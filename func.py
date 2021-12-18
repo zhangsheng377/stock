@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 
 from UTILS.utils import send_result
-from db_sheets import db_redis, get_db_sheet
+from db_sheets import db_redis, get_users, get_stock_data
 from save_tushare import add_stock
 
 VERSION = "0.0.12"
@@ -47,13 +47,6 @@ def func(user_name, stock_id, old_result_len):
         user_stock_events[user_name][stock_id] = schdule.enter(1, 0, func, (user_name, stock_id, old_result_len))
 
 
-def get_stock_data(stock_id):
-    data = db_redis.get(stock_id)
-    if data is None:
-        data = '[]'
-    return json.loads(data)
-
-
 def get_policy_data(stock_id, policy_name):
     data = db_redis.get(stock_id + '_' + policy_name)
     if data is None:
@@ -63,7 +56,7 @@ def get_policy_data(stock_id, policy_name):
 
 def send_one(user, stock_id):
     print(user, stock_id)
-    data = get_stock_data(stock_id)
+    data = json.loads(get_stock_data(stock_id))
     result_list = []
     for policy_name in user['policies']:
         result_list.extend(get_policy_data(stock_id, policy_name))
@@ -102,8 +95,8 @@ def discover_user():
 
 def update_user():
     try:
-        user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
-        for user in user_db_sheet.find():
+        users_temp = get_users()
+        for user in users_temp:
             users[user['_id']] = user
     except Exception as e:
         logging.warning("update_user error.", e)

@@ -6,7 +6,7 @@ import re
 # import aria2p
 
 from func import send_one
-from db_sheets import get_db_sheet
+from db_sheets import get_users, insert_users, update_one_user
 # import config_aria2
 
 application = Flask(__name__)
@@ -19,6 +19,20 @@ application = Flask(__name__)
 #         secret=config_aria2.aria2_secret
 #     )
 # )
+
+
+def get_filter_users(filter: dict):
+    users = get_users()
+    result = []
+    for user in users:
+        is_find = True
+        for key, value in filter.items():
+            if key not in user or user[key] != value:
+                is_find = False
+                break
+        if is_find:
+            result.append(user)
+    return result
 
 
 @application.route('/')
@@ -49,8 +63,7 @@ def get():
             if content == "清除缓存":
                 re_content = "缓存已清除"
             elif content == "查询已订阅股票":
-                user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
-                result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
+                result = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
                 if result:
                     re_content = str(result[0]['stocks'])
                 else:
@@ -61,8 +74,7 @@ def get():
                 try:
                     datas = content.split(" ")
                     stock_id = datas[1]
-                    user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
-                    result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
+                    result = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
                     if result:
                         user_name = result[0]['_id']
                         re_len = send_one(result[0], stock_id)
@@ -76,37 +88,34 @@ def get():
                 datas = content.split(" ")
                 user_name = datas[1]
                 # 此处逻辑需要细考
-                user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
-                if user_db_sheet.find(filter={'_id': user_name}):
+                if get_filter_users(filter={'_id': user_name}):
                     re_content = "您要绑定的用户名:{}，已被人绑定!请联系微信435878393".format(user_name)
-                elif user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")}):
+                elif get_filter_users(filter={'wechat': xml_dict.get("FromUserName")}):
                     re_content = "您的微信已被绑定!请联系微信435878393"
                 else:
-                    if user_db_sheet.insert({'_id': user_name, 'wechat': xml_dict.get("FromUserName")}):
+                    if insert_users(document={'_id': user_name, 'wechat': xml_dict.get("FromUserName")}):
                         re_content = "绑定成功"
                     else:
                         re_content = "绑定失败"
             elif content.startswith("订阅 "):
                 datas = content.split(" ")
                 stock_id = datas[1]
-                user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
-                result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
+                result = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
                 if result:
                     data = result[0]
                     if 'stocks' not in data.keys():
                         data['stocks'] = []
                     stocks = set(data['stocks'])
                     stocks.add(stock_id)
-                    user_db_sheet.update_one(filter={'wechat': xml_dict.get("FromUserName")},
-                                             update={'$set': {'stocks': list(stocks)}})
+                    update_one_user(filter={'wechat': xml_dict.get("FromUserName")},
+                                    update={'$set': {'stocks': list(stocks)}})
                     re_content = "订阅成功"
                 else:
                     re_content = "尚未绑定微信"
             elif content.startswith("取消订阅 "):
                 datas = content.split(" ")
                 stock_id = datas[1]
-                user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
-                result = user_db_sheet.find(filter={'wechat': xml_dict.get("FromUserName")})
+                result = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
                 if result:
                     data = result[0]
                     if 'stocks' not in data.keys():
@@ -114,8 +123,8 @@ def get():
                     stocks = set(data['stocks'])
                     if stock_id in stocks:
                         stocks.remove(stock_id)
-                        user_db_sheet.update_one(filter={'wechat': xml_dict.get("FromUserName")},
-                                                 update={'$set': {'stocks': list(stocks)}})
+                        update_one_user(filter={'wechat': xml_dict.get("FromUserName")},
+                                        update={'$set': {'stocks': list(stocks)}})
                         re_content = "取消订阅成功"
                     else:
                         re_content = f"尚未订阅{stock_id}"
