@@ -16,4 +16,6 @@ def upload(file_name):
     token = q.upload_token(bucket_name, file_name)
     ret, info = put_file(token, file_name, os.path.join('tmp', file_name))
     print(ret, info)
+    if info.status_code != 200:
+        import UTILS.config_qiniu
     return

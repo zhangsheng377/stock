@@ -56,7 +56,7 @@ def get_policy_data(stock_id, policy_name):
 
 def send_one(user, stock_id):
     print(user, stock_id)
-    data = json.loads(get_stock_data(stock_id))
+    data = get_stock_data(stock_id)
     result_list = []
     for policy_name in user['policies']:
         result_list.extend(get_policy_data(stock_id, policy_name))
