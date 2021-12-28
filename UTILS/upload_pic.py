@@ -3,7 +3,7 @@ import os
 from qiniu import Auth, put_file
 
 from db_sheets import db_redis
-from UTILS import config_qiniu # 载入时会加载key
+from UTILS import config_qiniu  # 载入时会加载key
 
 
 def upload(file_name):
@@ -17,5 +17,5 @@ def upload(file_name):
     ret, info = put_file(token, file_name, os.path.join('tmp', file_name))
     print(ret, info)
     if info.status_code != 200:
-        import UTILS.config_qiniu
+        t = config_qiniu.access_key
     return
