@@ -67,5 +67,5 @@ jobs:
 
     - name: Build and push Docker image
       run: |
-        docker build . --file ${{ env.DOCKER_FILE }} --tag ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest --build-arg QINIU_ACCESS_KEY=${{ secrets.QINIU_ACCESS_KEY }} --build-arg QINIU_SECRET_KEY=${{ secrets.QINIU_SECRET_KEY }}
+        docker build . --file ${{ env.DOCKER_FILE }} --tag ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest --build-arg QINIU_ACCESS_KEY=${{ secrets.QINIU_ACCESS_KEY }} --build-arg QINIU_SECRET_KEY=${{ secrets.QINIU_SECRET_KEY }} --build-arg RABBITMQ_USER=${{ secrets.RABBITMQ_USER }} --build-arg RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}
         docker push ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest
