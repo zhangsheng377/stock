@@ -5,7 +5,7 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
-    
+
 env:
   # Use docker.io for Docker Hub if empty
   REGISTRY: docker.io
@@ -22,51 +22,51 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v2
-    
-    # Login against a Docker registry except on PR
-    # https://github.com/docker/login-action
-    - name: Log into registry ${{ env.REGISTRY }}
-      if: github.event_name != 'pull_request'
-      uses: docker/login-action@v1
-      with:
-        registry: ${{ env.REGISTRY }}
-        username: ${{ secrets.DOCKER_HUB_USER }}
-        password: ${{ secrets.DOCKER_HUB_TOKEN }}
-        
-    # Extract metadata (tags, labels) for Docker
-    # https://github.com/docker/metadata-action
-    - name: Extract Docker metadata
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        images: ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}
-        
-    - name: Get Time
-      id: time
-      uses: nanzm/get-time-action@v1.1
-      with:
-        timeZone: 8
-        format: 'YYYY-MM-DD-HH-mm-ss'
-        
-    # Build and push Docker image with Buildx (don't push on PR)
-    # https://github.com/docker/build-push-action
-    # - name: Build and push Docker image
-    #   uses: docker/build-push-action@v2
-    #   with:
-    #     context: .
-    #     file: ${{ env.DOCKER_FILE }}
-    #     build-args: 
-    #       QINIU_ACCESS_KEY: ${{ secrets.QINIU_ACCESS_KEY }}
-    #       QINIU_SECRET_KEY: ${{ secrets.QINIU_SECRET_KEY }}
-    #     push: ${{ github.event_name != 'pull_request' }}
-    #     # tags: ${{ steps.meta.outputs.tags }}-${{ steps.time.outputs.time }}
-    #     tags: ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest
-    #     labels: ${{ steps.meta.outputs.labels }}
-    
-    - name: Build and push Docker image
-      run: |
-        docker build . --file ${{ env.DOCKER_FILE }} --tag ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest --build-arg QINIU_ACCESS_KEY=${{ secrets.QINIU_ACCESS_KEY }} --build-arg QINIU_SECRET_KEY=${{ secrets.QINIU_SECRET_KEY }} --build-arg RABBITMQ_USER=${{ secrets.RABBITMQ_USER }} --build-arg RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-        docker push ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest
+      # Login against a Docker registry except on PR
+      # https://github.com/docker/login-action
+      - name: Log into registry ${{ env.REGISTRY }}
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ secrets.DOCKER_HUB_USER }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
+
+      # Extract metadata (tags, labels) for Docker
+      # https://github.com/docker/metadata-action
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v3
+        with:
+          images: ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}
+
+      - name: Get Time
+        id: time
+        uses: nanzm/get-time-action@v1.1
+        with:
+          timeZone: 8
+          format: 'YYYY-MM-DD-HH-mm-ss'
+
+      # Build and push Docker image with Buildx (don't push on PR)
+      # https://github.com/docker/build-push-action
+      # - name: Build and push Docker image
+      #   uses: docker/build-push-action@v2
+      #   with:
+      #     context: .
+      #     file: ${{ env.DOCKER_FILE }}
+      #     build-args:
+      #       QINIU_ACCESS_KEY: ${{ secrets.QINIU_ACCESS_KEY }}
+      #       QINIU_SECRET_KEY: ${{ secrets.QINIU_SECRET_KEY }}
+      #     push: ${{ github.event_name != 'pull_request' }}
+      #     # tags: ${{ steps.meta.outputs.tags }}-${{ steps.time.outputs.time }}
+      #     tags: ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest
+      #     labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Build and push Docker image
+        run: |
+          docker build . --file ${{ env.DOCKER_FILE }} --tag ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest --build-arg QINIU_ACCESS_KEY=${{ secrets.QINIU_ACCESS_KEY }} --build-arg QINIU_SECRET_KEY=${{ secrets.QINIU_SECRET_KEY }} --build-arg RABBITMQ_USER=${{ secrets.RABBITMQ_USER }} --build-arg RABBITMQ_PASSWORD=${{ secrets.RABBITMQ_PASSWORD }}
+          
+          docker push ${{ env.REGISTRY }}/${{ secrets.DOCKER_HUB_USER }}/${{ env.IMAGE_NAME }}:latest

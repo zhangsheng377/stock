@@ -8,7 +8,7 @@ COPY ta-lib-0.4.0-src.tar.gz ta-lib-0.4.0-src.tar.gz
 RUN tar -zxvf ta-lib-0.4.0-src.tar.gz && cd /ta-lib && ./configure --prefix=/usr && make && make install
 
 # RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-RUN pip3 install numpy pandas requests TA-Lib tabulate pymongo matplotlib qiniu redis tushare
+RUN pip3 install numpy pandas requests TA-Lib tabulate pymongo matplotlib qiniu redis tushare pika
 
 RUN git clone https://github.com/zhangsheng377/stock.git --depth=1
 ARG QINIU_ACCESS_KEY
@@ -19,6 +19,12 @@ secret_key = \"$QINIU_SECRET_KEY\" \n\
 db_redis.set(\"qiniu_access_key\", access_key)\n\
 db_redis.set(\"qiniu_secret_key\", secret_key)"\
 > /stock/UTILS/config_qiniu.py
+
+ARG RABBITMQ_USER
+ARG RABBITMQ_PASSWORD
+RUN echo "rabbitmq_user = \"$RABBITMQ_USER\" \n\
+rabbitmq_password = \"$RABBITMQ_PASSWORD\" "\
+> /stock/UTILS/config_rabbitmq.py
 
 WORKDIR /stock
 

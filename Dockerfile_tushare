@@ -5,9 +5,14 @@ ENTRYPOINT []
 RUN apt clean && apt update && apt install git python3 python3-pip -y
 
 # RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-RUN pip3 install tushare pandas pymongo redis
+RUN pip3 install tushare pandas pymongo redis pika
 
 RUN git clone https://github.com/zhangsheng377/stock.git --depth=1
+ARG RABBITMQ_USER
+ARG RABBITMQ_PASSWORD
+RUN echo "rabbitmq_user = \"$RABBITMQ_USER\" \n\
+rabbitmq_password = \"$RABBITMQ_PASSWORD\" "\
+> /stock/UTILS/config_rabbitmq.py
 
 WORKDIR /stock
 
