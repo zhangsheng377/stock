@@ -8,7 +8,7 @@ from functools import partial
 
 import tushare as ts
 
-from db_sheets import get_db_sheet, add_stock_data, get_stock_ids, db_redis
+from UTILS.db_sheets import get_db_sheet, add_stock_data, get_stock_ids, db_redis
 
 VERSION = "0.0.8"
 

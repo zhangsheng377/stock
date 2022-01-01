@@ -6,7 +6,7 @@ import time
 from datetime import datetime
 
 from UTILS.utils import send_result
-from db_sheets import db_redis, get_users, get_stock_data
+from UTILS.db_sheets import db_redis, get_users, get_stock_data
 from save_tushare import add_stock
 
 VERSION = "0.0.12"

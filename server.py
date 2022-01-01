@@ -5,7 +5,7 @@ import time
 import re
 
 from func import send_one
-from db_sheets import get_users, insert_users, update_one_user
+from UTILS.db_sheets import get_users, insert_users, update_one_user
 
 application = Flask(__name__)
 

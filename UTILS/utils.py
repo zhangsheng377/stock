@@ -8,7 +8,7 @@ import requests
 import matplotlib.pyplot as plt
 
 from UTILS.upload_pic import upload
-from db_sheets import db_redis
+from UTILS.db_sheets import db_redis
 
 stock_name_map = json.loads(db_redis.get('stock_name_map'))
 

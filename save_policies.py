@@ -5,7 +5,7 @@ import threading
 import time
 from datetime import datetime
 
-from db_sheets import db_redis, get_stock_data
+from UTILS.db_sheets import db_redis, get_stock_data
 from policies import policies
 
 VERSION = "0.0.4"
