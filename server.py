@@ -3,22 +3,14 @@ import datetime
 import xmltodict
 import time
 import re
-# import aria2p
 
 from func import send_one
 from db_sheets import get_users, insert_users, update_one_user
-# import config_aria2
 
 application = Flask(__name__)
-# application.debug = True
 
-# aria2 = aria2p.API(
-#     aria2p.Client(
-#         host=config_aria2.aria2_host,
-#         port=config_aria2.aria2_port,
-#         secret=config_aria2.aria2_secret
-#     )
-# )
+
+# application.debug = True
 
 
 def get_filter_users(filter: dict):
@@ -130,10 +122,6 @@ def get():
                         re_content = f"尚未订阅{stock_id}"
                 else:
                     re_content = "尚未绑定微信"
-            # elif content.startswith("下载 "):
-            #     url = content[3:]
-            #     download = aria2.add(url)[0]
-            #     re_content = download.status
             else:
                 re_content = content
 
