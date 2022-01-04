@@ -13,11 +13,8 @@ RUN pip3 install numpy pandas requests TA-Lib tabulate pymongo matplotlib qiniu 
 RUN git clone https://github.com/zhangsheng377/stock.git --depth=1
 ARG QINIU_ACCESS_KEY
 ARG QINIU_SECRET_KEY
-RUN echo "from db_sheets import db_redis\n\
-access_key = \"$QINIU_ACCESS_KEY\" \n\
-secret_key = \"$QINIU_SECRET_KEY\" \n\
-db_redis.set(\"qiniu_access_key\", access_key)\n\
-db_redis.set(\"qiniu_secret_key\", secret_key)"\
+RUN echo "access_key = \"$QINIU_ACCESS_KEY\" \n\
+secret_key = \"$QINIU_SECRET_KEY\" "\
 > /stock/UTILS/config_qiniu.py
 
 ARG RABBITMQ_USER

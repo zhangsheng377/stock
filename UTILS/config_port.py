@@ -1,1 +1,1 @@
-stock_port = '22222'
+stock_port = 22222
