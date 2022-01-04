@@ -7,7 +7,7 @@ from datetime import datetime
 
 from UTILS.utils import send_result
 from UTILS.db_sheets import db_redis, get_users, get_stock_data
-from save_tushare import add_stock
+from save_tushare import add_one_stock_record
 
 VERSION = "0.0.12"
 
@@ -78,7 +78,7 @@ def discover_user():
                 if stock_id not in user_stock_locks[user_name]:
                     user_stock_locks[user_name][stock_id] = threading.Lock()
                     user_stock_events[user_name][stock_id] = schdule.enter(0, 0, func, (user_name, stock_id, 0))
-                    add_stock(stock_id, None)
+                    add_one_stock_record(stock_id, None)
                     print("discover_user add {} {}".format(user_name, stock_id))
 
             stock_ids = list(user_stock_events[user_name].keys())
