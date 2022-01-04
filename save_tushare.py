@@ -53,7 +53,7 @@ def get_today_tick_data(db_sheet):
     return data
 
 
-def add_stock(stock_id, last_time):
+def add_one_stock_record(stock_id, last_time):
     try:
         df = ts.get_realtime_quotes(stock_id).tail(1)  # Single stock symbol
         data_dict = df.to_dict()
@@ -78,12 +78,12 @@ def add_stock(stock_id, last_time):
     return last_time, False
 
 
-def func(stock_id, last_time):
+def stock_spider(stock_id, last_time):
     with stock_locks[stock_id]:
         try:
             now_hour = int(datetime.now().strftime('%H'))
             if 8 <= now_hour <= 16:
-                last_time, result = add_stock(stock_id, last_time)
+                last_time, result = add_one_stock_record(stock_id, last_time)
                 if result:
                     print('插入成功\n')
                 else:
@@ -92,7 +92,7 @@ def func(stock_id, last_time):
             logging.warning("save tushare error.", e)
 
         print(datetime.now())
-        schdule.enter(1, 0, func, (stock_id, last_time))
+        schdule.enter(1, 0, stock_spider, (stock_id, last_time))
 
 
 def set_stock_name_map(stock_id):
@@ -113,10 +113,10 @@ def discover_stock():
         for stock_id in stock_ids:
             stock_code = stock_id[3:]
             if stock_code not in stock_locks:
-                print("add stock:", stock_code)
+                print("discover stock:", stock_code)
                 set_stock_name_map(stock_id)
                 stock_locks[stock_code] = threading.Lock()
-                schdule.enter(0, 0, func, (stock_code, None))
+                schdule.enter(0, 0, stock_spider, (stock_code, None))
     except Exception as e:
         logging.warning("discover_stock error.", e)
     schdule.enter(10, 0, discover_stock, )
