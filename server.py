@@ -118,9 +118,12 @@ def get():
                     stocks = set(data['stocks'])
                     if stock_id in stocks:
                         stocks.remove(stock_id)
-                        update_one_user(filter={'wechat': xml_dict.get("FromUserName")},
-                                        update={'$set': {'stocks': list(stocks)}})
-                        re_content = "取消订阅成功"
+                        _filter = {'wechat': xml_dict.get("FromUserName")}
+                        _update = {'$set': {'stocks': list(stocks)}}
+                        result = update_one_user(filter=_filter, update=_update)
+                        re_content = f"尚未订阅{stock_id}. {_filter} {_update} {result.raw_result}"
+                        if result is not None and result.modified_count > 0:
+                            re_content = "取消订阅成功"
                     else:
                         re_content = f"尚未订阅{stock_id}"
                 else:
