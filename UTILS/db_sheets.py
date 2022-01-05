@@ -72,7 +72,8 @@ def get_stock_ids():
         database = get_db_sheet(database_name="tushare", sheet_name="sh_600196").get_database()
         return database.list_collection_names(filter={"name": re.compile('^sh_\d{6}')})
 
-    return _get_data('stock_ids', get_db_stock_ids)
+    # return _get_data('stock_ids', get_db_stock_ids)
+    return get_db_stock_ids()
 
 
 db_redis = redis.Redis(host='192.168.10.5', port=6379, db=0)
