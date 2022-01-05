@@ -99,9 +99,12 @@ def get():
                         data['stocks'] = []
                     stocks = set(data['stocks'])
                     stocks.add(stock_id)
-                    update_one_user(filter={'wechat': xml_dict.get("FromUserName")},
-                                    update={'$set': {'stocks': list(stocks)}})
-                    re_content = "订阅成功"
+                    _filter = {'wechat': xml_dict.get("FromUserName")}
+                    _update = {'$set': {'stocks': list(stocks)}}
+                    result = update_one_user(filter=_filter, update=_update)
+                    re_content = f"订阅失败. {_filter} {_update} {result}"
+                    if result.modified_count > 0:
+                        re_content = "订阅成功"
                 else:
                     re_content = "尚未绑定微信"
             elif content.startswith("取消订阅 "):

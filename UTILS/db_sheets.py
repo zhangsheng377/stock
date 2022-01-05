@@ -20,12 +20,18 @@ def _get_data(key: str, get_db_func):
     return data
 
 
-def get_users():
-    def get_db_users():
-        user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
-        return user_db_sheet.find()
+def get_db_users():
+    user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
+    return user_db_sheet.find()
 
+
+def get_users():
     return _get_data('users', get_db_users)
+
+
+def update_users_from_db():
+    data = get_db_users()
+    db_redis.set('users', json.dumps(data))
 
 
 def insert_users(document):
@@ -40,8 +46,7 @@ def insert_users(document):
 def update_one_user(filter, update):
     user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
     user_db_sheet.update_one(filter=filter, update=update)
-    users = get_users()
-    db_redis.set('users', json.dumps(users))
+    update_users_from_db()
 
 
 def get_stock_data(stock_id):
