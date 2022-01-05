@@ -45,8 +45,9 @@ def insert_users(document):
 
 def update_one_user(filter, update):
     user_db_sheet = get_db_sheet(database_name="user", sheet_name="user")
-    user_db_sheet.update_one(filter=filter, update=update)
+    result = user_db_sheet.update_one(filter=filter, update=update)
     update_users_from_db()
+    return result
 
 
 def get_stock_data(stock_id):
