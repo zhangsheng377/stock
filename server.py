@@ -103,7 +103,7 @@ def get():
                     _update = {'$set': {'stocks': list(stocks)}}
                     result = update_one_user(filter=_filter, update=_update)
                     re_content = f"订阅失败. {_filter} {_update} {result}"
-                    if result.modified_count > 0:
+                    if result is not None and result.modified_count > 0:
                         re_content = "订阅成功"
                 else:
                     re_content = "尚未绑定微信"
