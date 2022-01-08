@@ -1,8 +1,8 @@
-FROM ubuntu:latest
+FROM zhangsheng377/ubuntu:latest
 ENTRYPOINT []
 
 # RUN sed -i s@/archive.ubuntu.com/@/mirrors.aliyun.com/@g /etc/apt/sources.list
-RUN apt clean && apt update && apt install git python3 python3-pip -y
+# RUN apt clean && apt update && apt install git python3 python3-pip -y
 
 COPY ta-lib-0.4.0-src.tar.gz ta-lib-0.4.0-src.tar.gz
 RUN tar -zxvf ta-lib-0.4.0-src.tar.gz && cd /ta-lib && ./configure --prefix=/usr && make && make install
