@@ -1,5 +1,5 @@
 FROM zhangsheng377/ubuntu:latest
-ENTRYPOINT []
+# ENTRYPOINT []
 
 COPY ta-lib-0.4.0-src.tar.gz ta-lib-0.4.0-src.tar.gz
 RUN tar -zxvf ta-lib-0.4.0-src.tar.gz && cd /ta-lib && ./configure --prefix=/usr && make && make install
@@ -22,4 +22,4 @@ rabbitmq_password = \"$RABBITMQ_PASSWORD\" "\
 
 WORKDIR /stock
 
-CMD ["/bin/bash"]
+# CMD ["/bin/bash"]
