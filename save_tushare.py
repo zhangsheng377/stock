@@ -10,12 +10,10 @@ import tushare as ts
 from UTILS.db_sheets import get_db_sheet, add_stock_data, get_stock_ids, db_redis
 from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel
 from policies import policies
+from UTILS.utils import VERSION
 
 rabbitmq_channel = RabbitMqAgent.channel
-
 rabbitmq_channel.queue_declare(queue=polices_channel)
-
-VERSION = "0.0.9"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
@@ -69,7 +67,7 @@ def add_one_stock_record(stock_id, last_time):
             data_json = json.loads(data_json_str)
 
             data_json['_id'] = data_json['date'] + " " + data_json['time']
-            print(data_json)
+            logging.info(f"{data_json}")
             if add_stock_data(stock_id, data_json):
                 declare_polices_handle(stock_id)
                 return last_time, True
@@ -85,9 +83,9 @@ def stock_spider(stock_id, last_time):
             if 8 <= now_hour <= 16:
                 last_time, result = add_one_stock_record(stock_id, last_time)
                 if result:
-                    print('插入成功\n')
+                    logging.info('插入成功\n')
                 else:
-                    print('已经存在于数据库\n')
+                    logging.info('已经存在于数据库\n')
         except Exception as e:
             logging.warning("save tushare error.", e)
 
@@ -113,7 +111,7 @@ def discover_stock():
         for stock_id in stock_ids:
             stock_code = stock_id[3:]
             if stock_code not in stock_locks:
-                print("discover stock:", stock_code)
+                logging.info("discover stock:", stock_code)
                 set_stock_name_map(stock_id)
                 stock_locks[stock_code] = threading.Lock()
                 schdule.enter(0, 0, stock_spider, (stock_code, None))
@@ -123,6 +121,6 @@ def discover_stock():
 
 
 if __name__ == "__main__":
-    print(VERSION)
+    logging.info(f"{VERSION}")
     schdule.enter(0, 0, discover_stock, )
     schdule.run()

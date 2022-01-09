@@ -9,6 +9,7 @@ import xmltodict
 
 from UTILS.db_sheets import get_users, insert_users, update_one_user
 from UTILS.config_port import user_send_host, user_send_port
+from UTILS.utils import VERSION
 
 application = Flask(__name__)
 
@@ -154,5 +155,6 @@ def get():
 
 
 if __name__ == "__main__":
+    application.logger.info(f"{VERSION}")
     application.run(host="0.0.0.0", port=5000)
     # application.run(host="0.0.0.0")

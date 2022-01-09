@@ -1,9 +1,8 @@
 import json
-import logging
 
 from flask import Flask, request
 
-from UTILS.utils import send_result
+from UTILS.utils import send_result, VERSION
 from UTILS.db_sheets import db_redis, get_users, get_stock_data
 from UTILS.config_port import user_send_port
 
@@ -43,7 +42,7 @@ def send_user():
 
 
 def _send_user(user_id, stock_id, old_result_len):
-    print(user_id, stock_id, old_result_len)
+    application.logger.info(f"{user_id}, {stock_id}, {old_result_len}")
     user = get_user(user_id)
     if user is None:
         return -1
@@ -62,12 +61,13 @@ def _send_user(user_id, stock_id, old_result_len):
         return send_result(stock_id, data, result_list, ftqq_token, old_result_len)
     except Exception as e:
         if e.args[0] == 'data_df is empty':
-            logging.info("data_df is empty.")
+            application.logger.info("data_df is empty.")
             return 0
         else:
-            logging.warning("handle data error.", e)
+            application.logger.warning("handle data error.", e)
             return -1
 
 
 if __name__ == "__main__":
+    application.logger.info(f"{VERSION}")
     application.run(host="0.0.0.0", port=user_send_port)

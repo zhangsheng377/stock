@@ -6,6 +6,7 @@ import requests
 from UTILS.config_port import user_send_host, user_send_port
 from UTILS.db_sheets import get_users
 from UTILS.rabbitmq_utils import RabbitMqAgent, user_send_channel
+from UTILS.utils import VERSION
 
 rabbitmq_channel = RabbitMqAgent.channel
 rabbitmq_channel.queue_declare(queue=user_send_channel)
@@ -14,6 +15,7 @@ user_result_len_map = {}
 
 
 def handle_user_send(ch, method, properties, body):
+    logging.info(f"{body}")
     try:
         json_body = json.loads(body)
         stock_id = json_body['stock_id']
@@ -30,6 +32,7 @@ def handle_user_send(ch, method, properties, body):
             data = {'user_id': json.dumps(user['_id']), 'stock_id': json.dumps(stock_id),
                     'old_result_len': json.dumps(old_result_len)}  # 将携带的参数传给params
             re_len = requests.get(url, params=data).json()
+            logging.info(f"old_result_len:{old_result_len} re_len:{re_len}")
             user_result_len_map[user['_id']] = re_len
 
     except Exception as e:
@@ -37,4 +40,5 @@ def handle_user_send(ch, method, properties, body):
 
 
 if __name__ == "__main__":
+    logging.info(f"{VERSION}")
     rabbitmq_channel.basic_consume(queue=user_send_channel, on_message_callback=handle_user_send, auto_ack=True)

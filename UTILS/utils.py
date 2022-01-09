@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 from UTILS.upload_pic import upload
 from UTILS.db_sheets import db_redis
 
+VERSION = "0.0.15"
+
 stock_name_map = json.loads(db_redis.get('stock_name_map'))
 
 
