@@ -1,4 +1,5 @@
 import json
+import datetime
 
 from flask import Flask, request
 
@@ -29,6 +30,11 @@ def get_user(user_id):
         if user['_id'] == user_id:
             return user
     return None
+
+
+@application.route('/')
+def hello_world():
+    return 'Hello, World!' + '<br /><br />' + str(datetime.datetime.now())
 
 
 @application.route('/send_user', methods=["GET"])
