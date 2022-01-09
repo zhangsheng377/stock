@@ -113,6 +113,7 @@ def discover_stock():
         for stock_id in stock_ids:
             stock_code = stock_id[3:]
             if stock_code not in stock_locks:
+                print("discover stock:", stock_code)
                 logging.info("discover stock:", stock_code)
                 set_stock_name_map(stock_id)
                 stock_locks[stock_code] = threading.Lock()
