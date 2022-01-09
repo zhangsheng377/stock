@@ -26,8 +26,6 @@ def get_policy_data(stock_id, policy_name):
 
 def get_user(user_id):
     users = get_users()
-    print(user_id)
-    print(users)
     for user in users:
         if user['_id'] == user_id:
             return user
