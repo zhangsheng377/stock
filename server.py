@@ -12,9 +12,8 @@ from UTILS.config_port import user_send_host, user_send_port
 from UTILS.utils import VERSION
 
 application = Flask(__name__)
-
-
 # application.debug = True
+application.logger.basicConfig(level=application.logger.DEBUG)
 
 
 def get_filter_users(filter: dict):

@@ -8,6 +8,8 @@ from UTILS.db_sheets import get_users
 from UTILS.rabbitmq_utils import RabbitMqAgent, user_send_channel
 from UTILS.utils import VERSION
 
+logging.basicConfig(level=logging.DEBUG)
+
 rabbitmq_channel = RabbitMqAgent.channel
 rabbitmq_channel.queue_declare(queue=user_send_channel)
 

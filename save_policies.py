@@ -6,6 +6,8 @@ from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel, user_send_chann
 from policies import policies
 from UTILS.utils import is_stock_time, VERSION
 
+logging.basicConfig(level=logging.DEBUG)
+
 rabbitmq_channel = RabbitMqAgent.channel
 rabbitmq_channel.queue_declare(queue=polices_channel)
 rabbitmq_channel.queue_declare(queue=user_send_channel)
