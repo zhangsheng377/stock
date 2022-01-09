@@ -51,10 +51,12 @@ def _send_user(user_id, stock_id, old_result_len):
     application.logger.info(f"{user_id}, {stock_id}, {old_result_len}")
     user = get_user(user_id)
     if user is None:
+        application.logger.warning(f"user is None")
         return -1
 
     ftqq_token = user['ftqq_token']
     if not ftqq_token_is_valid(ftqq_token):
+        application.logger.warning(f"not ftqq_token_is_valid(ftqq_token)")
         return -1
 
     try:
