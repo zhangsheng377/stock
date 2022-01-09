@@ -2,6 +2,7 @@ version: "2.4"
 services:
   save_tushare:
     image: zhangsheng377/stock_base:latest
+    container_name: stock_save_tushare
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -15,10 +16,13 @@ services:
 
   stock:
     image: zhangsheng377/stock_base:latest
+    container_name: stock_stock
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
+    ports:
+      - "22222:22222"
     logging:
       options:
         max-size: "10m"
@@ -28,6 +32,7 @@ services:
 
   save_policies:
     image: zhangsheng377/stock_base:latest
+    container_name: stock_save_policies
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -41,6 +46,7 @@ services:
 
   server:
     image: zhangsheng377/stock_base:latest
+    container_name: stock_server
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -53,3 +59,17 @@ services:
     entrypoint:
       - /bin/bash
       - docker_cmd_server.sh
+
+  user_send:
+    image: zhangsheng377/stock_base:latest
+    container_name: stock_user_send
+    restart: always
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+    logging:
+      options:
+        max-size: "10m"
+    entrypoint:
+      - /bin/bash
+      - docker_cmd_user_send.sh

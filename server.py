@@ -1,11 +1,14 @@
-from flask import Flask, request
 import datetime
-import xmltodict
+import json
 import time
 import re
+import requests
 
-from func import send_one
+from flask import Flask, request
+import xmltodict
+
 from UTILS.db_sheets import get_users, insert_users, update_one_user
+from UTILS.config_port import user_send_host, user_send_port
 
 application = Flask(__name__)
 
@@ -52,24 +55,25 @@ def get():
         msg_type = xml_dict.get("MsgType")
         if msg_type == "text":  # 表示发送的是文本消息
             content = xml_dict.get("Content")
-            if content == "清除缓存":
-                re_content = "缓存已清除"
-            elif content == "查询已订阅股票":
-                result = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
-                if result:
-                    re_content = str(result[0]['stocks'])
+            if content == "查询已订阅股票":
+                users = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
+                if users:
+                    re_content = str(users[0]['stocks'])
                 else:
                     re_content = "尚未绑定微信"
-            elif re.fullmatch(r'\d{6}\.\w{2}', content):
-                re_content = "code: " + content
+            # elif re.fullmatch(r'\d{6}\.\w{2}', content):
+            #     re_content = "code: " + content
             elif content.startswith("查询 "):
                 try:
                     datas = content.split(" ")
                     stock_id = datas[1]
-                    result = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
-                    if result:
-                        user_name = result[0]['_id']
-                        re_len = send_one(result[0], stock_id)
+                    users = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
+                    if users:
+                        user_name = users[0]['_id']
+                        url = f'http://{user_send_host}:{user_send_port}/send_user'
+                        data = {'user_id': json.dumps(user_name), 'stock_id': json.dumps(stock_id),
+                                'old_result_len': json.dumps(0)}  # 将携带的参数传给params
+                        re_len = requests.get(url, params=data).json()
                         re_content = "发送成功: {} {} {}".format(user_name, stock_id, re_len)
                     else:
                         re_content = "尚未绑定微信"
@@ -92,12 +96,12 @@ def get():
             elif content.startswith("订阅 "):
                 datas = content.split(" ")
                 stock_id = datas[1]
-                result = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
-                if result:
-                    data = result[0]
-                    if 'stocks' not in data.keys():
-                        data['stocks'] = []
-                    stocks = set(data['stocks'])
+                users = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
+                if users:
+                    user = users[0]
+                    if 'stocks' not in user.keys():
+                        user['stocks'] = []
+                    stocks = set(user['stocks'])
                     stocks.add(stock_id)
                     _filter = {'wechat': xml_dict.get("FromUserName")}
                     _update = {'$set': {'stocks': list(stocks)}}
@@ -110,12 +114,12 @@ def get():
             elif content.startswith("取消订阅 "):
                 datas = content.split(" ")
                 stock_id = datas[1]
-                result = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
-                if result:
-                    data = result[0]
-                    if 'stocks' not in data.keys():
-                        data['stocks'] = []
-                    stocks = set(data['stocks'])
+                users = get_filter_users(filter={'wechat': xml_dict.get("FromUserName")})
+                if users:
+                    user = users[0]
+                    if 'stocks' not in user.keys():
+                        user['stocks'] = []
+                    stocks = set(user['stocks'])
                     if stock_id in stocks:
                         stocks.remove(stock_id)
                         _filter = {'wechat': xml_dict.get("FromUserName")}
@@ -150,5 +154,5 @@ def get():
 
 
 if __name__ == "__main__":
-    # application.run(host="0.0.0.0", port=5000)
-    application.run(host="0.0.0.0")
+    application.run(host="0.0.0.0", port=5000)
+    # application.run(host="0.0.0.0")

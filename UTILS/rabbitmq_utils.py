@@ -11,3 +11,7 @@ class RabbitMqAgent(object):
                                             credentials=_credentials)
     _connection = pika.BlockingConnection(_parameters)
     channel = _connection.channel()
+
+
+polices_channel = 'stock_polices'
+user_send_channel = 'stock_user_send'

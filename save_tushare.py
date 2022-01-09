@@ -4,13 +4,18 @@ import sched
 import threading
 import time
 from datetime import datetime
-from functools import partial
 
 import tushare as ts
 
 from UTILS.db_sheets import get_db_sheet, add_stock_data, get_stock_ids, db_redis
+from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel
+from policies import policies
 
-VERSION = "0.0.8"
+rabbitmq_channel = RabbitMqAgent.channel
+
+rabbitmq_channel.queue_declare(queue=polices_channel)
+
+VERSION = "0.0.9"
 
 schdule = sched.scheduler(time.time, time.sleep)
 
@@ -45,12 +50,10 @@ stock_locks = {}
 '''
 
 
-def get_today_tick_data(db_sheet):
-    date_str = datetime.now().strftime("%Y-%m-%d")
-    # date_str = '2020-12-25'
-    regex_str = '^' + date_str
-    data = db_sheet.find(filter={'_id': {"$regex": regex_str}}, sort=[('_id', 1)])
-    return data
+def declare_polices_handle(stock_id):
+    for (policy_name, policy_handle) in policies.items():
+        rabbitmq_channel.basic_publish(exchange='', routing_key=polices_channel,
+                                       body=json.dumps({'stock_id': stock_id, 'policy_name': policy_name}))
 
 
 def add_one_stock_record(stock_id, last_time):
@@ -67,12 +70,9 @@ def add_one_stock_record(stock_id, last_time):
 
             data_json['_id'] = data_json['date'] + " " + data_json['time']
             print(data_json)
-            db_sheet = get_db_sheet(database_name="tushare", sheet_name="sh_" + stock_id)
-            add_result = add_stock_data(stock_id, data_json, partial(get_today_tick_data, db_sheet=db_sheet))
-            if add_result:
+            if add_stock_data(stock_id, data_json):
+                declare_polices_handle(stock_id)
                 return last_time, True
-            else:
-                return last_time, False
     except Exception as e:
         logging.warning("add_stock error.", e)
     return last_time, False

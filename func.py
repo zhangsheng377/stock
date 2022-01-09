@@ -1,50 +1,20 @@
 import json
 import logging
-import sched
-import threading
-import time
-from datetime import datetime
+
+from flask import Flask, request
 
 from UTILS.utils import send_result
 from UTILS.db_sheets import db_redis, get_users, get_stock_data
-from save_tushare import add_one_stock_record
+from UTILS.config_port import user_send_port
 
-VERSION = "0.0.12"
+application = Flask(__name__)
 
-schdule = sched.scheduler(time.time, time.sleep)
 
-user_stock_locks = {}
-user_stock_events = {}
-
-users = {}
+# application.debug = True
 
 
 def ftqq_token_is_valid(ftqq_token):
     return ftqq_token is not None and ftqq_token != ''
-
-
-def func(user_name, stock_id, old_result_len):
-    with user_stock_locks[user_name][stock_id]:
-        ftqq_token = users[user_name]['ftqq_token']
-        if ftqq_token_is_valid(ftqq_token):
-            try:
-                now_hour = int(datetime.now().strftime('%H'))
-                if 8 <= now_hour <= 16:
-                    data = get_stock_data(stock_id)
-
-                    result_list = []
-                    for policy_name in users[user_name]['policies']:
-                        result_list.extend(get_policy_data(stock_id, policy_name))
-
-                    old_result_len = send_result(stock_id, data, result_list, ftqq_token, old_result_len)
-            except Exception as e:
-                if e.args[0] == 'data_df is empty':
-                    logging.info("data_df is empty.")
-                else:
-                    logging.warning("handle data error.", e)
-
-        print(datetime.now())
-        user_stock_events[user_name][stock_id] = schdule.enter(1, 0, func, (user_name, stock_id, old_result_len))
 
 
 def get_policy_data(stock_id, policy_name):
@@ -54,57 +24,50 @@ def get_policy_data(stock_id, policy_name):
     return json.loads(data)
 
 
-def send_one(user, stock_id):
-    print(user, stock_id)
-    data = get_stock_data(stock_id)
-    result_list = []
-    for policy_name in user['policies']:
-        result_list.extend(get_policy_data(stock_id, policy_name))
-    return send_result(stock_id, data, result_list, user['ftqq_token'], 0)
+def get_user(user_id):
+    users = get_users()
+    for user in users:
+        if user['_id'] == user_id:
+            return user
+    return None
 
 
-def discover_user():
+@application.route('/send_user', methods=["GET"])
+def send_user():
+    # 以GET方式传参数，通过args取值
+    user_id = request.args['user_id']
+    stock_id = request.args['stock_id']
+    old_result_len = request.args['old_result_len']
+    result_len = _send_user(user_id, stock_id, old_result_len)
+    return json.dumps(result_len)
+
+
+def _send_user(user_id, stock_id, old_result_len):
+    print(user_id, stock_id, old_result_len)
+    user = get_user(user_id)
+    if user is None:
+        return -1
+
+    ftqq_token = user['ftqq_token']
+    if not ftqq_token_is_valid(ftqq_token):
+        return -1
+
     try:
-        for (user_name, user_data) in users.items():
-            if user_data['ftqq_token'] is None or user_data['ftqq_token'] == '':
-                continue
+        data = get_stock_data(stock_id)
 
-            if user_name not in user_stock_locks:
-                user_stock_locks[user_name] = {}
-            if user_name not in user_stock_events:
-                user_stock_events[user_name] = {}
+        result_list = []
+        for policy_name in user['policies']:
+            result_list.extend(get_policy_data(stock_id, policy_name))
 
-            for stock_id in user_data['stocks']:
-                if stock_id not in user_stock_locks[user_name]:
-                    user_stock_locks[user_name][stock_id] = threading.Lock()
-                    user_stock_events[user_name][stock_id] = schdule.enter(0, 0, func, (user_name, stock_id, 0))
-                    add_one_stock_record(stock_id, None)
-                    print("discover_user add {} {}".format(user_name, stock_id))
-
-            stock_ids = list(user_stock_events[user_name].keys())
-            for stock_id in stock_ids:
-                if stock_id not in user_data['stocks']:
-                    schdule.cancel(user_stock_events[user_name][stock_id])
-                    user_stock_events[user_name].pop(stock_id)
-                    user_stock_locks[user_name].pop(stock_id)
-                    print("discover_user cancel {} {}".format(user_name, stock_id))
+        return send_result(stock_id, data, result_list, ftqq_token, old_result_len)
     except Exception as e:
-        logging.warning("discover_stock error.", e)
-    schdule.enter(10, 0, discover_user, )
-
-
-def update_user():
-    try:
-        users_temp = get_users()
-        for user in users_temp:
-            users[user['_id']] = user
-    except Exception as e:
-        logging.warning("update_user error.", e)
-    schdule.enter(10, 0, update_user, )
+        if e.args[0] == 'data_df is empty':
+            logging.info("data_df is empty.")
+            return 0
+        else:
+            logging.warning("handle data error.", e)
+            return -1
 
 
 if __name__ == "__main__":
-    print(VERSION)
-    schdule.enter(0, 0, update_user, )
-    schdule.enter(1, 0, discover_user, )
-    schdule.run()
+    application.run(host="0.0.0.0", port=user_send_port)

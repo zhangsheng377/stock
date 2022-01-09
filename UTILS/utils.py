@@ -44,7 +44,6 @@ def send_result(stock_id, data, result_list, ftqq_token, old_result_len):
     data_result_df = pandas.DataFrame(result_list)
     if len(data) > 0 and not data_result_df.empty and data_result_df.shape[0] != old_result_len:
         data_result_df = data_result_df.sort_values(by='time', ascending=True)
-        old_result_len = data_result_df.shape[0]
         # print(data_result_df)
         # print(old_result_len)
 
@@ -70,3 +69,10 @@ def send_result(stock_id, data, result_list, ftqq_token, old_result_len):
         print(res.text)
 
     return data_result_df.shape[0]
+
+
+def is_stock_time():
+    now_hour = int(datetime.now().strftime('%H'))
+    if 8 <= now_hour <= 16:
+        return True
+    return False
