@@ -44,3 +44,5 @@ def handle_user_send(ch, method, properties, body):
 if __name__ == "__main__":
     logging.info(f"VERSION: {VERSION}")
     rabbitmq_channel.basic_consume(queue=user_send_channel, on_message_callback=handle_user_send, auto_ack=True)
+    # 开始接收信息，并进入阻塞状态，队列里有信息才会调用callback进行处理
+    rabbitmq_channel.start_consuming()

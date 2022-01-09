@@ -123,6 +123,7 @@ def discover_stock():
 
 
 if __name__ == "__main__":
+    print(f"{VERSION}")
     logging.info(f"VERSION: {VERSION}")
     schdule.enter(0, 0, discover_stock, )
     schdule.run()
