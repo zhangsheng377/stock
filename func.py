@@ -76,4 +76,5 @@ def _send_user(user_id, stock_id, old_result_len):
 
 if __name__ == "__main__":
     application.logger.info(f"{VERSION}")
-    application.run(host="0.0.0.0", port=user_send_port)
+    # application.run(host="0.0.0.0", port=user_send_port)
+    application.run(host="0.0.0.0")
