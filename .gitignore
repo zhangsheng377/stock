@@ -1,0 +1,10 @@
+.idea
+.ipynb_checkpoints
+__pycache__
+*.xlsx
+config_aria2.py
+UTILS/config_qiniu.py
+UTILS/config_rabbitmq.py
+ftqq_tokens.py
+test*.py
+*.ipynb
