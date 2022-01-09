@@ -1,7 +1,7 @@
 version: "2.4"
 services:
   save_tushare:
-    image: zhangsheng377/save_tushare:latest
+    image: zhangsheng377/stock_base:latest
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -9,9 +9,12 @@ services:
     logging:
       options:
         max-size: "10m"
+    entrypoint:
+      - /bin/bash
+      - docker_cmd_save_tushare.sh
 
   stock:
-    image: zhangsheng377/stock:latest
+    image: zhangsheng377/stock_base:latest
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -19,9 +22,12 @@ services:
     logging:
       options:
         max-size: "10m"
+    entrypoint:
+      - /bin/bash
+      - docker_cmd.sh
 
   save_policies:
-    image: zhangsheng377/save_policies:latest
+    image: zhangsheng377/stock_base:latest
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -29,9 +35,12 @@ services:
     logging:
       options:
         max-size: "10m"
+    entrypoint:
+      - /bin/bash
+      - docker_cmd_save_policies.sh
 
   server:
-    image: zhangsheng377/server:latest
+    image: zhangsheng377/stock_base:latest
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -41,3 +50,6 @@ services:
     logging:
       options:
         max-size: "10m"
+    entrypoint:
+      - /bin/bash
+      - docker_cmd_server.sh
