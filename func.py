@@ -1,5 +1,6 @@
 import json
 import datetime
+import logging
 
 from flask import Flask, request
 
@@ -9,7 +10,7 @@ from UTILS.config_port import user_send_port
 
 application = Flask(__name__)
 # application.debug = True
-application.logger.basicConfig(level=application.logger.INFO)
+application.logger.setLevel(logging.INFO)
 
 
 def ftqq_token_is_valid(ftqq_token):

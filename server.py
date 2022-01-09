@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import time
 import re
 import requests
@@ -13,7 +14,7 @@ from UTILS.utils import VERSION
 
 application = Flask(__name__)
 # application.debug = True
-application.logger.basicConfig(level=application.logger.INFO)
+application.logger.setLevel(logging.INFO)
 
 
 def get_filter_users(filter: dict):
