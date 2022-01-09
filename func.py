@@ -42,9 +42,9 @@ def hello_world():
 @application.route('/send_user', methods=["GET"])
 def send_user():
     # 以GET方式传参数，通过args取值
-    user_id = request.args['user_id']
-    stock_id = request.args['stock_id']
-    old_result_len = request.args['old_result_len']
+    user_id = json.loads(request.args['user_id'])
+    stock_id = json.loads(request.args['stock_id'])
+    old_result_len = json.loads(request.args['old_result_len'])
     result_len = _send_user(user_id, stock_id, old_result_len)
     return json.dumps(result_len)
 
