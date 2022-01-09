@@ -14,12 +14,18 @@ from UTILS.utils import VERSION
 
 logging.basicConfig(level=logging.INFO)
 
+print(f"init start")
+logging.info(f"init start")
+
 rabbitmq_channel = RabbitMqAgent.channel
 rabbitmq_channel.queue_declare(queue=polices_channel)
 
 schdule = sched.scheduler(time.time, time.sleep)
 
 stock_locks = {}
+
+print(f"init over")
+logging.info(f"init over")
 
 '''
 0：name，股票名字
