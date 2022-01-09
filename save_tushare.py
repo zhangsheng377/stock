@@ -12,7 +12,7 @@ from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel
 from policies import policies
 from UTILS.utils import VERSION
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 rabbitmq_channel = RabbitMqAgent.channel
 rabbitmq_channel.queue_declare(queue=polices_channel)
@@ -123,6 +123,6 @@ def discover_stock():
 
 
 if __name__ == "__main__":
-    logging.info(f"{VERSION}")
+    logging.info(f"VERSION: {VERSION}")
     schdule.enter(0, 0, discover_stock, )
     schdule.run()

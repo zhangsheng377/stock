@@ -8,7 +8,7 @@ from UTILS.db_sheets import get_users
 from UTILS.rabbitmq_utils import RabbitMqAgent, user_send_channel
 from UTILS.utils import VERSION
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 rabbitmq_channel = RabbitMqAgent.channel
 rabbitmq_channel.queue_declare(queue=user_send_channel)
@@ -42,5 +42,5 @@ def handle_user_send(ch, method, properties, body):
 
 
 if __name__ == "__main__":
-    logging.info(f"{VERSION}")
+    logging.info(f"VERSION: {VERSION}")
     rabbitmq_channel.basic_consume(queue=user_send_channel, on_message_callback=handle_user_send, auto_ack=True)

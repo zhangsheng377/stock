@@ -9,7 +9,7 @@ from UTILS.config_port import user_send_port
 
 application = Flask(__name__)
 # application.debug = True
-application.logger.basicConfig(level=application.logger.DEBUG)
+application.logger.basicConfig(level=application.logger.INFO)
 
 
 def ftqq_token_is_valid(ftqq_token):
@@ -74,6 +74,6 @@ def _send_user(user_id, stock_id, old_result_len):
 
 
 if __name__ == "__main__":
-    application.logger.info(f"{VERSION}")
+    application.logger.info(f"VERSION: {VERSION}")
     # application.run(host="0.0.0.0", port=user_send_port)
     application.run(host="0.0.0.0")

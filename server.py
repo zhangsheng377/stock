@@ -13,7 +13,7 @@ from UTILS.utils import VERSION
 
 application = Flask(__name__)
 # application.debug = True
-application.logger.basicConfig(level=application.logger.DEBUG)
+application.logger.basicConfig(level=application.logger.INFO)
 
 
 def get_filter_users(filter: dict):
@@ -154,6 +154,6 @@ def get():
 
 
 if __name__ == "__main__":
-    application.logger.info(f"{VERSION}")
+    application.logger.info(f"VERSION: {VERSION}")
     # application.run(host="0.0.0.0", port=5000)
     application.run(host="0.0.0.0")

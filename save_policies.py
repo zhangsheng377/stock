@@ -6,7 +6,7 @@ from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel, user_send_chann
 from policies import policies
 from UTILS.utils import is_stock_time, VERSION
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 
 rabbitmq_channel = RabbitMqAgent.channel
 rabbitmq_channel.queue_declare(queue=polices_channel)
@@ -36,5 +36,5 @@ def handle_police(ch, method, properties, body):
 
 
 if __name__ == "__main__":
-    logging.info(f"{VERSION}")
+    logging.info(f"VERSION: {VERSION}")
     rabbitmq_channel.basic_consume(queue=polices_channel, on_message_callback=handle_police, auto_ack=True)
