@@ -101,9 +101,8 @@ def set_stock_name_map(stock_id):
         data_one = stock_db_sheet.find_one()
         return data_one['name']
 
-    stock_code = stock_id[3:]
     stock_name_map = json.loads(db_redis.get("stock_name_map"))
-    stock_name_map[stock_code] = get_db_stock_name()
+    stock_name_map[stock_id] = get_db_stock_name()
     db_redis.set("stock_name_map", json.dumps(stock_name_map))
 
 
@@ -111,13 +110,12 @@ def discover_stock():
     try:
         stock_ids = get_stock_ids()
         for stock_id in stock_ids:
-            stock_code = stock_id[3:]
-            if stock_code not in stock_locks:
-                print("discover stock:", stock_code)
-                logging.info("discover stock:", stock_code)
+            if stock_id not in stock_locks:
+                print("discover stock:", stock_id)
+                logging.info("discover stock:", stock_id)
                 set_stock_name_map(stock_id)
-                stock_locks[stock_code] = threading.Lock()
-                schdule.enter(0, 0, stock_spider, (stock_code, None))
+                stock_locks[stock_id] = threading.Lock()
+                schdule.enter(0, 0, stock_spider, (stock_id, None))
     except Exception as e:
         logging.warning("discover_stock error.", e)
     schdule.enter(10, 0, discover_stock, )
@@ -128,3 +126,4 @@ if __name__ == "__main__":
     logging.info(f"VERSION: {VERSION}")
     schdule.enter(0, 0, discover_stock, )
     schdule.run()
+    # print(ts.get_realtime_quotes('000726'))
