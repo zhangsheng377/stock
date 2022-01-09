@@ -91,7 +91,7 @@ def stock_spider(stock_id, last_time):
         except Exception as e:
             logging.warning("save tushare error.", e)
 
-        print(datetime.now())
+        # print(datetime.now())
         schdule.enter(1, 0, stock_spider, (stock_id, last_time))
 
 
