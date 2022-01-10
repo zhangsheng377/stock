@@ -99,6 +99,8 @@ def set_stock_name_map(stock_id):
     def get_db_stock_name():
         stock_db_sheet = get_db_sheet(database_name="tushare", sheet_name='sh_' + stock_id)
         data_one = stock_db_sheet.find_one()
+        if data_one is None or 'name' not in data_one:
+            return stock_id
         return data_one['name']
 
     stock_name_map = json.loads(db_redis.get("stock_name_map"))
