@@ -10,7 +10,7 @@ import tushare as ts
 from UTILS.db_sheets import get_db_sheet, add_stock_data, get_stock_ids, db_redis
 from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel
 from policies import policies
-from UTILS.utils import VERSION
+from UTILS.utils import VERSION, is_stock_time
 
 logging.basicConfig(level=logging.INFO)
 
@@ -87,8 +87,7 @@ def add_one_stock_record(stock_id, last_time):
 def stock_spider(stock_id, last_time):
     with stock_locks[stock_id]:
         try:
-            now_hour = int(datetime.now().strftime('%H'))
-            if 8 <= now_hour <= 16:
+            if is_stock_time():
                 last_time, result = add_one_stock_record(stock_id, last_time)
                 if result:
                     logging.info('插入成功\n')
@@ -104,7 +103,7 @@ def stock_spider(stock_id, last_time):
 
 def set_stock_name_map(stock_id):
     def get_db_stock_name():
-        stock_db_sheet = get_db_sheet(database_name="tushare", sheet_name=stock_id)
+        stock_db_sheet = get_db_sheet(database_name="tushare", sheet_name='sh_' + stock_id)
         data_one = stock_db_sheet.find_one()
         return data_one['name']
 
@@ -118,8 +117,8 @@ def discover_stock():
         stock_ids = get_stock_ids()
         for stock_id in stock_ids:
             if stock_id not in stock_locks:
-                print("discover stock:", stock_id)
-                logging.info("discover stock:", stock_id)
+                print(f"discover stock: {stock_id}")
+                logging.info(f"discover stock: {stock_id}")
                 set_stock_name_map(stock_id)
                 stock_locks[stock_id] = threading.Lock()
                 schdule.enter(0, 0, stock_spider, (stock_id, None))
