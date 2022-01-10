@@ -2,6 +2,7 @@ version: "2.4"
 services:
   redis:
     image: redis:latest
+    container_name: sys_redis
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -15,6 +16,7 @@ services:
 
   mongo:
     image: mongo:latest
+    container_name: sys_mongo
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro
@@ -28,6 +30,7 @@ services:
   
   rabbit:
     image: rabbitmq:3.9-management
+    container_name: sys_rabbitmq
     restart: always
     volumes:
       - /etc/timezone:/etc/timezone:ro

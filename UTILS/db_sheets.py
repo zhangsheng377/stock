@@ -5,6 +5,7 @@ from datetime import datetime
 import redis
 
 from DATABASE import database_factory
+from UTILS.config_port import redis_host, redis_port
 
 
 def get_db_sheet(database_name, sheet_name):
@@ -90,7 +91,7 @@ def get_stock_ids():
     return stock_ids
 
 
-db_redis = redis.Redis(host='192.168.10.5', port=6379, db=0)
+db_redis = redis.Redis(host=redis_host, port=redis_port, db=0)
 
 if __name__ == '__main__':
     users = get_users()

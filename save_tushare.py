@@ -14,18 +14,12 @@ from UTILS.utils import VERSION, is_stock_time
 
 logging.basicConfig(level=logging.INFO)
 
-print(f"init start")
-logging.info(f"init start")
-
 rabbitmq_channel = RabbitMqAgent.channel
 rabbitmq_channel.queue_declare(queue=polices_channel)
 
 schdule = sched.scheduler(time.time, time.sleep)
 
 stock_locks = {}
-
-print(f"init over")
-logging.info(f"init over")
 
 '''
 0：name，股票名字
@@ -96,7 +90,7 @@ def stock_spider(stock_id, last_time):
         except Exception as e:
             logging.warning("save tushare error.", e)
 
-        print(f"{datetime.now()} {stock_id}")
+        # print(f"{datetime.now()} {stock_id}")
         logging.info(f"{datetime.now()} {stock_id}")
         schdule.enter(1, 0, stock_spider, (stock_id, last_time))
 
@@ -117,7 +111,7 @@ def discover_stock():
         stock_ids = get_stock_ids()
         for stock_id in stock_ids:
             if stock_id not in stock_locks:
-                print(f"discover stock: {stock_id}")
+                # print(f"discover stock: {stock_id}")
                 logging.info(f"discover stock: {stock_id}")
                 set_stock_name_map(stock_id)
                 stock_locks[stock_id] = threading.Lock()
@@ -128,7 +122,7 @@ def discover_stock():
 
 
 if __name__ == "__main__":
-    print(f"{VERSION}")
+    # print(f"{VERSION}")
     logging.info(f"VERSION: {VERSION}")
     schdule.enter(0, 0, discover_stock, )
     schdule.run()
