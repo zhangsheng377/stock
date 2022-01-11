@@ -12,7 +12,7 @@ from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel
 from policies import policies
 from UTILS.utils import VERSION, is_stock_time
 
-logging.basicConfig(level=logging.INFO)
+logging.getLogger().setLevel(logging.INFO)
 
 rabbitmq_channel = RabbitMqAgent.channel
 rabbitmq_channel.queue_declare(queue=polices_channel)
@@ -73,8 +73,11 @@ def add_one_stock_record(stock_id, last_time):
             if add_stock_data(stock_id, data_json):
                 declare_polices_handle(stock_id)
                 return last_time, True
+            else:
+                logging.warning("add_stock_data error.")
     except Exception as e:
         logging.warning("add_stock error.", e)
+    logging.info(f"add_one_stock_record: {stock_id} {last_time}")
     return last_time, False
 
 
@@ -90,8 +93,7 @@ def stock_spider(stock_id, last_time):
         except Exception as e:
             logging.warning("save tushare error.", e)
 
-        # print(f"{datetime.now()} {stock_id}")
-        logging.info(f"{datetime.now()} {stock_id}")
+        logging.info(f"stock_spider {stock_id}")
         schdule.enter(1, 0, stock_spider, (stock_id, last_time))
 
 
@@ -113,7 +115,6 @@ def discover_stock():
         stock_ids = get_stock_ids()
         for stock_id in stock_ids:
             if stock_id not in stock_locks:
-                # print(f"discover stock: {stock_id}")
                 logging.info(f"discover stock: {stock_id}")
                 set_stock_name_map(stock_id)
                 stock_locks[stock_id] = threading.Lock()
@@ -124,7 +125,6 @@ def discover_stock():
 
 
 if __name__ == "__main__":
-    # print(f"{VERSION}")
     logging.info(f"VERSION: {VERSION}")
     schdule.enter(0, 0, discover_stock, )
     schdule.run()
