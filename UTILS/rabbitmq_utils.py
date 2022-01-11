@@ -9,7 +9,7 @@ class RabbitMqAgent(object):
     _parameters = pika.ConnectionParameters(host=rabbitmq_host,
                                             port=rabbitmq_port,
                                             virtual_host='/',
-                                            heartbeat_interval=10,
+                                            heartbeat=10,
                                             credentials=_credentials)
     _connection = pika.BlockingConnection(_parameters)
     channel = _connection.channel()
@@ -17,3 +17,9 @@ class RabbitMqAgent(object):
 
 polices_channel = 'stock_polices'
 user_send_channel = 'stock_user_send'
+
+if __name__ == "__main__":
+    rabbitmq_channel = RabbitMqAgent.channel
+    rabbitmq_channel.queue_declare(queue='hello')
+    rabbitmq_channel.basic_publish(exchange='', routing_key='hello', body=bytes('Hello World!', encoding='utf-8'))
+    print(" [x] Sent 'Hello World!'")
