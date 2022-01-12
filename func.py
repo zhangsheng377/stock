@@ -1,16 +1,15 @@
 import json
 import datetime
-import logging
 
 from flask import Flask, request
 
-from UTILS.utils import send_result, VERSION
+from UTILS.utils import send_result, VERSION, LOGGING_LEVEL
 from UTILS.db_sheets import db_redis, get_users, get_stock_data
 from UTILS.config_port import user_send_port
 
 application = Flask(__name__)
 # application.debug = True
-application.logger.setLevel(logging.INFO)
+application.logger.setLevel(LOGGING_LEVEL)
 
 
 def ftqq_token_is_valid(ftqq_token):

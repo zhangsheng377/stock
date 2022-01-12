@@ -2,6 +2,7 @@ import json
 import os
 import uuid
 from datetime import datetime
+import logging
 
 import pandas
 import requests
@@ -11,8 +12,11 @@ from UTILS.upload_pic import upload
 from UTILS.db_sheets import db_redis
 
 VERSION = "0.0.15"
+LOGGING_LEVEL = logging.INFO
 
 stock_name_map = json.loads(db_redis.get('stock_name_map'))
+
+logging.getLogger().setLevel(LOGGING_LEVEL)
 
 
 def plot_result(data, data_result_df, file_name):
@@ -53,7 +57,7 @@ def send_result(stock_id, data, result_list, ftqq_token, old_result_len):
         try:
             plot_result(data, data_result_df, file_name)
         except Exception as e:
-            print(e)
+            logging.warning(e)
 
         data_result_df[' '] = '&nbsp;&nbsp;&nbsp;&nbsp;'
         data_result_df = data_result_df[['time', ' ', 'price', ' ', '指标']]
@@ -62,13 +66,13 @@ def send_result(stock_id, data, result_list, ftqq_token, old_result_len):
         except Exception as e:
             result_markdown = data_result_df.to_markdown(showindex=False)
         result_markdown += "\n\n![](http://image.zhangshengdong.com/{}.png)".format(file_name)
-        print(result_markdown)
+        logging.info(result_markdown)
 
         res = requests.post('https://sc.ftqq.com/{}.send'.format(ftqq_token),
                             data={'text': stock_name_map[stock_id] + " " + stock_id,
                                   'desp': result_markdown + "\n\n" + datetime.now().strftime(
                                       "%Y-%m-%d %H:%M:%S")})
-        print(res.text)
+        logging.info(res.text)
 
     return data_result_df.shape[0]
 

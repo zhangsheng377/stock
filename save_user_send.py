@@ -6,12 +6,9 @@ import requests
 from UTILS.config_port import user_send_host, user_send_port
 from UTILS.db_sheets import get_users
 from UTILS.rabbitmq_utils import RabbitMqAgent, user_send_channel
-from UTILS.utils import VERSION
+from UTILS.utils import VERSION, LOGGING_LEVEL
 
-logging.getLogger().setLevel(logging.INFO)
-
-rabbitmq_channel = RabbitMqAgent.channel
-rabbitmq_channel.queue_declare(queue=user_send_channel)
+logging.getLogger().setLevel(LOGGING_LEVEL)
 
 user_result_len_map = {}
 
@@ -43,6 +40,5 @@ def handle_user_send(ch, method, properties, body):
 
 if __name__ == "__main__":
     logging.info(f"VERSION: {VERSION}")
-    rabbitmq_channel.basic_consume(queue=user_send_channel, on_message_callback=handle_user_send, auto_ack=True)
-    # 开始接收信息，并进入阻塞状态，队列里有信息才会调用callback进行处理
-    rabbitmq_channel.start_consuming()
+    with RabbitMqAgent() as rabbitmq:
+        rabbitmq.start_consuming(queue_name=user_send_channel, func_callback=handle_user_send)

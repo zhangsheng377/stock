@@ -1,8 +1,12 @@
 import os
+import logging
 
 from qiniu import Auth, put_file
 
 from UTILS import config_qiniu  # 载入时会加载key
+from UTILS.utils import LOGGING_LEVEL
+
+logging.getLogger().setLevel(LOGGING_LEVEL)
 
 
 def upload(file_name):
@@ -12,7 +16,7 @@ def upload(file_name):
 
     token = q.upload_token(bucket_name, file_name)
     ret, info = put_file(token, file_name, os.path.join('tmp', file_name))
-    print(ret, info)
+    logging.info(f"{ret}, {info}")
     # if info.status_code != 200:
     #     t = config_qiniu.access_key
     return

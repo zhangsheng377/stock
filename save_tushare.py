@@ -3,19 +3,15 @@ import logging
 import sched
 import threading
 import time
-from datetime import datetime
 
 import tushare as ts
 
 from UTILS.db_sheets import get_db_sheet, add_stock_data, get_stock_ids, db_redis
 from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel
 from policies import policies
-from UTILS.utils import VERSION, is_stock_time
+from UTILS.utils import VERSION, is_stock_time, LOGGING_LEVEL
 
-logging.getLogger().setLevel(logging.INFO)
-
-rabbitmq_channel = RabbitMqAgent.channel
-rabbitmq_channel.queue_declare(queue=polices_channel)
+logging.getLogger().setLevel(LOGGING_LEVEL)
 
 schdule = sched.scheduler(time.time, time.sleep)
 
@@ -51,9 +47,10 @@ stock_locks = {}
 
 
 def declare_polices_handle(stock_id):
-    for (policy_name, policy_handle) in policies.items():
-        rabbitmq_channel.basic_publish(exchange='', routing_key=polices_channel,
-                                       body=json.dumps({'stock_id': stock_id, 'policy_name': policy_name}))
+    with RabbitMqAgent() as rabbitmq:
+        for (policy_name, policy_handle) in policies.items():
+            rabbitmq.put(queue_name=polices_channel, route_key=polices_channel,
+                         message_str=json.dumps({'stock_id': stock_id, 'policy_name': policy_name}))
 
 
 def add_one_stock_record(stock_id, last_time):
