@@ -9,7 +9,8 @@ import tushare as ts
 from UTILS.db_sheets import get_db_sheet, add_stock_data, get_stock_ids, db_redis
 from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel
 from policies import policies
-from UTILS.utils import VERSION, is_stock_time, LOGGING_LEVEL
+from UTILS.utils import is_stock_time
+from UTILS.config import VERSION, LOGGING_LEVEL
 
 logging.getLogger().setLevel(LOGGING_LEVEL)
 

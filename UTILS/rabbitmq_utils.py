@@ -6,7 +6,7 @@ import pika
 
 from UTILS import config_rabbitmq
 from UTILS.config_port import rabbitmq_host, rabbitmq_port
-from UTILS.utils import LOGGING_LEVEL
+from UTILS.config import LOGGING_LEVEL
 
 logging.getLogger().setLevel(LOGGING_LEVEL)
 

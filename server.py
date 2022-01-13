@@ -8,7 +8,7 @@ import xmltodict
 
 from UTILS.db_sheets import get_users, insert_users, update_one_user
 from UTILS.config_port import user_send_host, user_send_port
-from UTILS.utils import VERSION, LOGGING_LEVEL
+from UTILS.config import VERSION, LOGGING_LEVEL
 
 application = Flask(__name__)
 # application.debug = True

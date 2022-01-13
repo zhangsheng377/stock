@@ -3,7 +3,8 @@ import datetime
 
 from flask import Flask, request
 
-from UTILS.utils import send_result, VERSION, LOGGING_LEVEL
+from UTILS.utils import send_result
+from UTILS.config import VERSION, LOGGING_LEVEL
 from UTILS.db_sheets import db_redis, get_users, get_stock_data
 from UTILS.config_port import user_send_port
 

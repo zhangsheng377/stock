@@ -4,7 +4,7 @@ import logging
 from UTILS.db_sheets import db_redis, get_stock_data
 from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel, user_send_channel
 from policies import policies
-from UTILS.utils import VERSION, LOGGING_LEVEL
+from UTILS.config import VERSION, LOGGING_LEVEL
 
 logging.getLogger().setLevel(LOGGING_LEVEL)
 

@@ -6,7 +6,7 @@ import requests
 from UTILS.config_port import user_send_host, user_send_port
 from UTILS.db_sheets import get_users
 from UTILS.rabbitmq_utils import RabbitMqAgent, user_send_channel
-from UTILS.utils import VERSION, LOGGING_LEVEL
+from UTILS.config import VERSION, LOGGING_LEVEL
 
 logging.getLogger().setLevel(LOGGING_LEVEL)
 
