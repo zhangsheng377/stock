@@ -52,12 +52,12 @@ def _send_user(user_id, stock_id, old_result_len):
     user = get_user(user_id)
     if user is None:
         application.logger.warning(f"user is None")
-        return -1
+        return old_result_len
 
     ftqq_token = user['ftqq_token']
     if not ftqq_token_is_valid(ftqq_token):
         application.logger.warning(f"not ftqq_token_is_valid(ftqq_token)")
-        return -1
+        return old_result_len
 
     try:
         data = get_stock_data(stock_id)
@@ -65,15 +65,17 @@ def _send_user(user_id, stock_id, old_result_len):
         result_list = []
         for policy_name in user['policies']:
             result_list.extend(get_policy_data(stock_id, policy_name))
+        if len(result_list) == old_result_len:
+            return old_result_len
 
         return send_result(stock_id, data, result_list, ftqq_token, old_result_len)
+
     except Exception as e:
         if e.args[0] == 'data_df is empty':
             application.logger.info("data_df is empty.")
-            return 0
         else:
             application.logger.warning("handle data error.", e)
-            return -1
+    return old_result_len
 
 
 if __name__ == "__main__":

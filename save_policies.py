@@ -8,6 +8,8 @@ from UTILS.config import VERSION, LOGGING_LEVEL
 
 logging.getLogger().setLevel(LOGGING_LEVEL)
 
+stock_police_result_len_map = {}
+
 
 def handle_police(ch, method, properties, body):
     logging.info(f"{body}")
@@ -18,14 +20,22 @@ def handle_police(ch, method, properties, body):
 
         data = get_stock_data(stock_id)
 
-        result_list = []
         if len(data) > 0:
             logging.info(f"had data: {len(data)}")
             result_list = policies[policy_name](data)
-            with RabbitMqAgent() as rabbitmq:
-                rabbitmq.put(queue_name=user_send_channel, route_key=user_send_channel,
-                             message_str=json.dumps({'stock_id': stock_id, 'policy_name': policy_name}))
-        db_redis.set(stock_id + '_' + policy_name, json.dumps(result_list))
+
+            key = stock_id + '_' + policy_name
+            old_result_len = stock_police_result_len_map.get(key, 0)
+            if len(result_list) != old_result_len:
+                db_redis.set(key, json.dumps(result_list))
+                stock_police_result_len_map[key] = len(result_list)
+                with RabbitMqAgent() as rabbitmq:
+                    rabbitmq.put(queue_name=user_send_channel, route_key=user_send_channel,
+                                 message_str=json.dumps({'stock_id': stock_id, 'policy_name': policy_name}))
+
+                logging.info(f"old_result_len={old_result_len}, len(result_list)={len(result_list)}")
+        else:
+            logging.warning(f"get_stock_data ken <= 0. len={len(data)}")
 
     except Exception as e:
         logging.warning("save policy error.", e)

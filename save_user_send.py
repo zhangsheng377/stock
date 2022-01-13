@@ -40,5 +40,6 @@ def handle_user_send(ch, method, properties, body):
 
 if __name__ == "__main__":
     logging.info(f"VERSION: {VERSION}")
+    # print(json.dumps({'stock_id': '688180', 'policy_name': 'magic_nine_turns'}))
     with RabbitMqAgent() as rabbitmq:
         rabbitmq.start_consuming(queue_name=user_send_channel, func_callback=handle_user_send)
