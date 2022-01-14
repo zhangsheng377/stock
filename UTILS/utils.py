@@ -1,7 +1,7 @@
 import json
 import os
 import uuid
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 import pandas
@@ -80,3 +80,27 @@ def is_stock_time():
     if 8 <= now_hour <= 16:
         return True
     return False
+
+
+def get_policy_data(stock_id, policy_name):
+    data = db_redis.get(stock_id + '_' + policy_name)
+    if data is None:
+        data = '[]'
+    return json.loads(data)
+
+
+def get_policy_datas(stock_id, policy_names):
+    result_list = []
+    for policy_name in policy_names:
+        result_list.extend(get_policy_data(stock_id, policy_name))
+    return result_list
+
+
+def get_rest_seconds():
+    now = datetime.now()
+
+    today_begin = datetime(now.year, now.month, now.day, 8, 0, 0)
+    tomorrow_begin = today_begin + timedelta(days=1)
+
+    rest_seconds = (tomorrow_begin - now).seconds
+    return rest_seconds

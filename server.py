@@ -78,7 +78,7 @@ def get():
                         re_content = "尚未绑定微信"
                 except Exception as e:
                     re_content = "发送失败: " + str(e)
-                    application.logger.error(re_content)
+                    application.logger.error(re_content, exc_info=True)
             elif content.startswith("绑定 "):
                 datas = content.split(" ")
                 user_name = datas[1]
@@ -145,6 +145,8 @@ def get():
                     "Content": re_content,
                 }
             }
+
+        application.logger.info(f" \n\n\n")
 
         # 将字典转换为xml字符串
         resp_xml_str = xmltodict.unparse(resp_dict)

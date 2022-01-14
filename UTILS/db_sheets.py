@@ -6,6 +6,7 @@ import redis
 
 from DATABASE import database_factory
 from UTILS.config_port import redis_host, redis_port
+from UTILS.utils import get_rest_seconds
 
 
 def get_db_sheet(database_name, sheet_name):
@@ -72,7 +73,7 @@ def add_stock_data(stock_id, insert_data_json):
     db_sheet = get_db_sheet(database_name="tushare", sheet_name="sh_" + stock_id)
     if db_sheet.insert(insert_data_json):
         data = get_today_tick_data(db_sheet)
-        db_redis.set(stock_id, json.dumps(data))
+        db_redis.set(stock_id, json.dumps(data), ex=get_rest_seconds())
         return True
     return False
 

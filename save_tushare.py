@@ -69,14 +69,14 @@ def add_one_stock_record(stock_id, last_time):
             data_json['_id'] = data_json['date'] + " " + data_json['time']
             logging.info(f"{data_json}")
             if add_stock_data(stock_id, data_json):
-                logging.info(f"add_one_stock_record: {stock_id}")
+                logging.info(f"add_one_stock_record: {stock_id}. \n\n\n")
                 declare_polices_handle(stock_id)
                 return last_time, True
             else:
-                logging.warning("add_stock_data error.")
-    except Exception as e:
-        logging.warning("add_stock error.", e)
-    # logging.info(f"add_one_stock_record: {stock_id} {last_time}")
+                logging.warning("add_stock_data error. \n\n\n")
+    except Exception:
+        logging.warning("add_stock error.", exc_info=True)
+
     return last_time, False
 
 
