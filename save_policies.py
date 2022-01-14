@@ -3,7 +3,7 @@ import logging
 
 from UTILS.db_sheets import db_redis, get_stock_data
 from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel, user_send_channel
-from UTILS.utils import get_rest_seconds
+from UTILS.time_utils import get_rest_seconds
 from policies import policies
 from UTILS.config import VERSION, LOGGING_LEVEL
 

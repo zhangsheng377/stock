@@ -6,7 +6,7 @@ import redis
 
 from DATABASE import database_factory
 from UTILS.config_port import redis_host, redis_port
-from UTILS.utils import get_rest_seconds
+from UTILS.time_utils import get_rest_seconds
 
 
 def get_db_sheet(database_name, sheet_name):
