@@ -69,11 +69,11 @@ def add_one_stock_record(stock_id, last_time):
             data_json['_id'] = data_json['date'] + " " + data_json['time']
             logging.info(f"{data_json}")
             if add_stock_data(stock_id, data_json):
-                logging.info(f"add_one_stock_record: {stock_id}. \n\n\n")
+                logging.info(f"add_one_stock_record: {stock_id}.")
                 declare_polices_handle(stock_id)
                 return last_time, True
             else:
-                logging.warning("add_stock_data error. \n\n\n")
+                logging.warning("add_stock_data error.")
     except Exception:
         logging.warning("add_stock error.", exc_info=True)
 
@@ -88,7 +88,7 @@ def stock_spider(stock_id, last_time):
                 if result:
                     logging.info('插入成功\n')
                 else:
-                    logging.info('已经存在于数据库\n')
+                    logging.debug('已经存在于数据库\n')
         except Exception as e:
             logging.warning("save tushare error.", e)
 

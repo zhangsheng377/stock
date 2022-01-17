@@ -7,7 +7,6 @@ from UTILS.config_port import user_send_host, user_send_port
 from UTILS.db_sheets import get_users
 from UTILS.rabbitmq_utils import RabbitMqAgent, user_send_channel
 from UTILS.config import VERSION, LOGGING_LEVEL
-from UTILS.utils import get_policy_datas
 
 logging.getLogger().setLevel(LOGGING_LEVEL)
 
@@ -28,23 +27,15 @@ def handle_user_send(ch, method, properties, body):
             if policy_name not in user['policies']:
                 continue
 
-            old_result_len = user_result_len_map.get(user['_id'], 0)
-            result_list = get_policy_datas(stock_id, user['policies'])
-            if len(result_list) == old_result_len:
-                logging.warning(f"len(result_list) == old_result_len. old_result_len={old_result_len}")
-                continue
+            key = user['_id'] + '_' + stock_id
+            old_result_len = user_result_len_map.get(key, 0)
 
             url = f'http://{user_send_host}:{user_send_port}/send_user'
             data = {'user_id': json.dumps(user['_id']), 'stock_id': json.dumps(stock_id),
                     'old_result_len': json.dumps(old_result_len)}  # 将携带的参数传给params
             re_len = requests.get(url, params=data).json()
             logging.info(f"old_result_len:{old_result_len} re_len:{re_len}")
-            user_result_len_map[user['_id']] = re_len
-
-            if len(result_list) != re_len:
-                logging.warning(f"len(result_list) != re_len. len(result_list)={len(result_list)}")
-
-        logging.info(f" \n\n\n")
+            user_result_len_map[key] = re_len
 
     except Exception:
         logging.warning("save policy error.", exc_info=True)

@@ -32,6 +32,14 @@ def get_users():
     return _get_data('users', get_db_users)
 
 
+def get_user(user_id):
+    users = get_users()
+    for user in users:
+        if user_id == user['_id']:
+            return user
+    return None
+
+
 def update_redis_users_from_db():
     data = get_db_users()
     db_redis.set('users', json.dumps(data))

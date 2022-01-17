@@ -13,7 +13,7 @@ stock_police_result_len_map = {}
 
 
 def handle_police(ch, method, properties, body):
-    logging.info(f"{body}")
+    logging.debug(f"{body}")
     try:
         json_body = json.loads(body)
         stock_id = json_body['stock_id']
@@ -24,7 +24,7 @@ def handle_police(ch, method, properties, body):
             logging.warning(f"get_stock_data ken <= 0. len={len(data)}")
             return
 
-        logging.info(f"had data: {len(data)}")
+        logging.debug(f"had data: {len(data)}")
         result_list = policies[policy_name](data)
 
         key = stock_id + '_' + policy_name
@@ -39,7 +39,7 @@ def handle_police(ch, method, properties, body):
             rabbitmq.put(queue_name=user_send_channel, route_key=user_send_channel,
                          message_str=json.dumps({'stock_id': stock_id, 'policy_name': policy_name}))
 
-        logging.info(f"old_result_len={old_result_len}, len(result_list)={len(result_list)} \n\n\n")
+        logging.debug(f"old_result_len={old_result_len}, len(result_list)={len(result_list)}")
 
     except Exception:
         logging.warning("save policy error.", exc_info=True)

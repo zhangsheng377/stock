@@ -50,6 +50,8 @@ def get():
         xml_dict = xmltodict.parse(xml_str)
         xml_dict = xml_dict.get("xml")
 
+        application.logger.info(f"xml_dict:{xml_dict}")
+
         # 提取消息类型
         msg_type = xml_dict.get("MsgType")
         if msg_type == "text":  # 表示发送的是文本消息
@@ -146,10 +148,11 @@ def get():
                 }
             }
 
-        application.logger.info(f" \n\n\n")
-
         # 将字典转换为xml字符串
         resp_xml_str = xmltodict.unparse(resp_dict)
+
+        application.logger.info(f"resp_xml_str:{resp_xml_str}")
+
         # 返回消息数据给微信服务器
         return resp_xml_str
 
