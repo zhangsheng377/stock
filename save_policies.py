@@ -30,7 +30,7 @@ def handle_police(ch, method, properties, body):
         key = stock_id + '_' + policy_name
         old_result_len = stock_police_result_len_map.get(key, 0)
         if len(result_list) == old_result_len:
-            logging.warning(f"len(result_list) == old_result_len. old_result_len={old_result_len}")
+            logging.debug(f"len(result_list) == old_result_len. old_result_len={old_result_len}")
             return
 
         db_redis.set(key, json.dumps(result_list), ex=get_rest_seconds())
