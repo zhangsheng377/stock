@@ -101,6 +101,7 @@ def set_stock_name_map(stock_id):
         stock_db_sheet = get_db_sheet(database_name="tushare", sheet_name='sh_' + stock_id)
         data_one = stock_db_sheet.find_one()
         if data_one is None or 'name' not in data_one:
+            schdule.enter(60, 0, set_stock_name_map, (stock_id,))
             return stock_id
         return data_one['name']
 
