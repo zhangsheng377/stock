@@ -1,6 +1,7 @@
 import logging
 import os
 import sys
+import traceback
 
 import pika
 
@@ -23,13 +24,20 @@ class RabbitMqAgent(object):
         self._connection = None
 
     def connect(self):
-        # 连接RabbitMQ的参数对象
-        parameter = pika.ConnectionParameters(host=self._host,
-                                              port=self._port,
-                                              virtual_host=self._vhost,
-                                              credentials=self._credentials,
-                                              heartbeat=10)
-        self._connection = pika.BlockingConnection(parameter)  # 建立连接
+        try:
+            # 连接RabbitMQ的参数对象
+            parameter = pika.ConnectionParameters(host=self._host,
+                                                  port=self._port,
+                                                  virtual_host=self._vhost,
+                                                  credentials=self._credentials,
+                                                  heartbeat=10)
+            self._connection = pika.BlockingConnection(parameter)  # 建立连接
+        except Exception as e:
+            traceback.print_exc()
+            try:
+                sys.exit(0)
+            except SystemExit:
+                os._exit(0)
 
     def __enter__(self):
         self.connect()
