@@ -8,3 +8,5 @@ UTILS/config_rabbitmq.py
 ftqq_tokens.py
 test*.py
 *.ipynb
+ta-lib/
+tmp/
