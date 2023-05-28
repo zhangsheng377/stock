@@ -12,9 +12,15 @@ from UTILS.config import LOGGING_LEVEL
 from UTILS.upload_pic import upload
 from UTILS.db_sheets import db_redis
 
-stock_name_map = json.loads(db_redis.get('stock_name_map'))
-
 logging.getLogger().setLevel(LOGGING_LEVEL)
+
+
+def get_stock_name_map():
+    stock_name_map_ = db_redis.get('stock_name_map')
+    if not stock_name_map_:
+        return {}
+    stock_name_map = json.loads(stock_name_map_)
+    return stock_name_map
 
 
 def plot_result(data, data_result_df, file_name):
@@ -66,6 +72,7 @@ def send_result(stock_id, data, result_list, ftqq_token, old_result_len):
         result_markdown += "\n\n![](http://image.zhangshengdong.com/{}.png)".format(file_name)
         logging.info(result_markdown)
 
+        stock_name_map = get_stock_name_map()
         res = requests.post('https://sc.ftqq.com/{}.send'.format(ftqq_token),
                             data={'text': stock_name_map[stock_id] + " " + stock_id,
                                   'desp': result_markdown + "\n\n" + datetime.now().strftime(
@@ -94,5 +101,3 @@ def get_policy_datas(stock_id, policy_names):
     for policy_name in policy_names:
         result_list.extend(get_policy_data(stock_id, policy_name))
     return result_list
-
-

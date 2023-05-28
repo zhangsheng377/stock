@@ -9,7 +9,7 @@ import tushare as ts
 from UTILS.db_sheets import get_db_sheet, add_stock_data, get_stock_ids, db_redis
 from UTILS.rabbitmq_utils import RabbitMqAgent, polices_channel
 from policies import policies
-from UTILS.utils import is_stock_time
+from UTILS.utils import is_stock_time, get_stock_name_map
 from UTILS.config import VERSION, LOGGING_LEVEL
 
 logging.getLogger().setLevel(LOGGING_LEVEL)
@@ -105,7 +105,7 @@ def set_stock_name_map(stock_id):
             return stock_id
         return data_one['name']
 
-    stock_name_map = json.loads(db_redis.get("stock_name_map"))
+    stock_name_map = get_stock_name_map()
     stock_name_map[stock_id] = get_db_stock_name()
     db_redis.set("stock_name_map", json.dumps(stock_name_map))
 
